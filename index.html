@@ -65,14 +65,7 @@
                     INSIDER GAME
                 </h1>
             </div>
-            <span class="text-[10px] tracking-widest text-indigo-300/70 font-mono block mt-0.5">V2.2 MULTI-DEVICE & PASS-PLAY</span>
-            
-            <!-- Connection Status Badge -->
-            <div id="connection-status" onclick="openFirebaseModal()" class="mt-2 inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] bg-slate-700/70 text-slate-300 border border-slate-600 cursor-pointer hover:bg-slate-700 transition">
-                <span id="conn-dot" class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
-                <span id="conn-text">โหมดทดสอบในเครื่อง (Local Sync)</span>
-                <i class="fa-solid fa-gear text-[10px] ml-1"></i>
-            </div>
+            <span class="text-[10px] tracking-widest text-indigo-300/70 font-mono block mt-0.5">V2.3 MULTI-DEVICE & PASS-PLAY</span>
         </header>
 
         <!-- Dynamic Screen Container -->
@@ -566,8 +559,6 @@
                     }
                     dbRef = firebase.database();
                     isFirebaseActive = true;
-                    document.getElementById('conn-dot').className = "w-2 h-2 rounded-full bg-emerald-400 animate-ping";
-                    document.getElementById('conn-text').innerText = "เชื่อมต่อ Firebase Online สดแล้ว";
 
                     // Fetch Word Bank from Firebase backend
                     fetchWordBankFromFirebase();
