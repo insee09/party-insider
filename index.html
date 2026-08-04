@@ -1,0 +1,1350 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Insider Game - Online & Pass & Play</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Kanit -->
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Firebase SDKs v8 -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Kanit', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #311042 100%);
+            min-height: 100vh;
+            color: #f8fafc;
+        }
+
+        /* 3D Flip Card Effect */
+        .perspective-1000 {
+            perspective: 1000px;
+        }
+        .transform-style-3d {
+            transform-style: preserve-3d;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .backface-hidden {
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+        }
+        .rotate-y-180 {
+            transform: rotateY(180deg);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.6);
+            border-radius: 8px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #6366f1;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center justify-center min-h-screen p-4">
+
+    <!-- Application Wrapper -->
+    <div class="w-full max-w-md bg-slate-900/90 backdrop-blur-md rounded-2xl border border-slate-700/60 shadow-2xl overflow-hidden my-auto flex flex-col">
+        
+        <!-- App Top Header -->
+        <header class="bg-slate-800/80 border-b border-slate-700/50 p-4 text-center relative">
+            <div class="flex items-center justify-center gap-2">
+                <i class="fa-solid fa-user-secret text-indigo-400 text-2xl"></i>
+                <h1 class="text-2xl font-bold tracking-wider bg-gradient-to-r from-indigo-400 via-purple-300 to-pink-400 bg-clip-text text-transparent">
+                    INSIDER GAME
+                </h1>
+            </div>
+            <span class="text-[10px] tracking-widest text-indigo-300/70 font-mono block mt-0.5">V2.2 MULTI-DEVICE & PASS-PLAY</span>
+            
+            <!-- Connection Status Badge -->
+            <div id="connection-status" onclick="openFirebaseModal()" class="mt-2 inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] bg-slate-700/70 text-slate-300 border border-slate-600 cursor-pointer hover:bg-slate-700 transition">
+                <span id="conn-dot" class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+                <span id="conn-text">โหมดทดสอบในเครื่อง (Local Sync)</span>
+                <i class="fa-solid fa-gear text-[10px] ml-1"></i>
+            </div>
+        </header>
+
+        <!-- Dynamic Screen Container -->
+        <main class="p-5 flex-1 flex flex-col justify-center">
+
+            <!-- 1. MAIN MENU SCREEN -->
+            <div id="screen-main-menu" class="space-y-6 text-center">
+                <div class="py-4">
+                    <div class="w-20 h-20 mx-auto bg-indigo-500/10 rounded-full flex items-center justify-center border border-indigo-500/30 mb-3 shadow-inner">
+                        <i class="fa-solid fa-masks-theater text-4xl text-indigo-400"></i>
+                    </div>
+                    <h2 class="text-xl font-bold text-slate-100">เลือกโหมดการเล่น</h2>
+                    <p class="text-xs text-slate-400 mt-1">สนุกได้ทั้งแบบใช้เครื่องเดียว หรือต่อเน็ตเล่นคนละเครื่อง</p>
+                </div>
+
+                <div class="space-y-3">
+                    <button onclick="goToMode('online-choice')" class="w-full py-4 px-5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-semibold rounded-xl shadow-lg transition active:scale-95 flex items-center justify-between group">
+                        <div class="flex items-center gap-3">
+                            <i class="fa-solid fa-globe text-xl text-indigo-200"></i>
+                            <div class="text-left">
+                                <div class="text-sm font-bold">🌐 เล่นหลายเครื่องกับเพื่อน (Online)</div>
+                                <div class="text-[11px] text-indigo-200/70 font-normal">Online Lobby แยกมือถือทุกผู้เล่น</div>
+                            </div>
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-xs opacity-60 group-hover:translate-x-1 transition-transform"></i>
+                    </button>
+
+                    <button onclick="goToMode('pass-play')" class="w-full py-4 px-5 bg-slate-800 hover:bg-slate-700/80 text-slate-200 font-semibold rounded-xl border border-slate-700 transition active:scale-95 flex items-center justify-between group">
+                        <div class="flex items-center gap-3">
+                            <i class="fa-solid fa-mobile-screen-button text-xl text-purple-400"></i>
+                            <div class="text-left">
+                                <div class="text-sm font-bold">📱 เล่นเครื่องเดียว (Pass & Play)</div>
+                                <div class="text-[11px] text-slate-400 font-normal">วนส่งมือถือเปิดดูบทบาทในวงเพื่อน</div>
+                            </div>
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-xs opacity-60 group-hover:translate-x-1 transition-transform"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 2. ONLINE CHOICE SCREEN -->
+            <div id="screen-online-choice" class="hidden space-y-5">
+                <button onclick="showScreen('screen-main-menu')" class="text-xs text-slate-400 hover:text-white transition flex items-center gap-1">
+                    <i class="fa-solid fa-arrow-left"></i> ย้อนกลับหน้าหลัก
+                </button>
+
+                <!-- Create Room Block -->
+                <div class="bg-slate-800/80 border border-slate-700/80 rounded-xl p-4 space-y-3">
+                    <div class="flex items-center gap-2 text-indigo-400 font-bold text-sm">
+                        <i class="fa-solid fa-crown text-amber-400"></i> สร้างห้องใหม่ (เป็น Game Master)
+                    </div>
+                    <div>
+                        <label class="text-xs text-slate-400 block mb-1">ชื่อของคุณ (GM):</label>
+                        <input type="text" id="host-name-input" placeholder="เช่น GM Boss" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500">
+                    </div>
+                    <button onclick="createNewRoom()" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm rounded-lg shadow active:scale-95 transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-plus-circle"></i> สร้างห้องเกมเลย
+                    </button>
+                </div>
+
+                <div class="relative flex py-1 items-center">
+                    <div class="flex-grow border-t border-slate-700"></div>
+                    <span class="flex-shrink mx-3 text-slate-500 text-xs">หรือ</span>
+                    <div class="flex-grow border-t border-slate-700"></div>
+                </div>
+
+                <!-- Join Room Block -->
+                <div class="bg-slate-800/80 border border-slate-700/80 rounded-xl p-4 space-y-3">
+                    <div class="flex items-center gap-2 text-purple-400 font-bold text-sm">
+                        <i class="fa-solid fa-right-to-bracket"></i> เข้าร่วมห้องเพื่อน
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="text-xs text-slate-400 block mb-1">รหัสห้อง (8 ตัว):</label>
+                            <input type="text" id="join-code-input" placeholder="เช่น X7K2P9Q1" maxlength="8" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white uppercase text-center font-mono tracking-wider focus:outline-none focus:border-purple-500">
+                        </div>
+                        <div>
+                            <label class="text-xs text-slate-400 block mb-1">ชื่อผู้เล่นของคุณ:</label>
+                            <input type="text" id="join-name-input" placeholder="ชื่อผู้เล่น..." class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-500">
+                        </div>
+                    </div>
+                    <button onclick="joinExistingRoom()" class="w-full py-2.5 bg-purple-600 hover:bg-purple-500 text-white font-bold text-sm rounded-lg shadow active:scale-95 transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-gamepad"></i> เข้าห้องเกม
+                    </button>
+                </div>
+
+                <!-- Database Info Box -->
+                <div class="text-center pt-1">
+                    <button onclick="openFirebaseModal()" class="text-xs text-indigo-400 hover:underline flex items-center justify-center gap-1 mx-auto">
+                        <i class="fa-solid fa-cloud text-xs"></i> ตั้งค่า Firebase Database
+                    </button>
+                </div>
+            </div>
+
+            <!-- 3. ONLINE LOBBY SCREEN -->
+            <div id="screen-online-lobby" class="hidden space-y-4">
+                <!-- Header Code Box -->
+                <div class="bg-gradient-to-r from-indigo-900/60 to-purple-900/60 border border-indigo-500/40 rounded-xl p-3 text-center relative shadow-lg">
+                    <span class="text-[10px] text-indigo-300 tracking-widest uppercase block">ROOM CODE</span>
+                    <div class="flex items-center justify-center gap-2 mt-0.5">
+                        <span id="lobby-room-code" class="text-2xl font-black font-mono tracking-wider text-amber-300">--------</span>
+                        <button onclick="copyRoomCode()" class="text-slate-400 hover:text-white p-1 text-sm active:scale-90 transition" title="ก๊อบปี้รหัส">
+                            <i class="fa-solid fa-copy"></i>
+                        </button>
+                    </div>
+                    <p class="text-[11px] text-slate-300 mt-1">แชร์รหัสนี้ให้เพื่อนๆ กรอกเข้าห้องได้เลย</p>
+                </div>
+
+                <!-- Player List Container -->
+                <div>
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-xs font-bold text-slate-300 flex items-center gap-1.5">
+                            <i class="fa-solid fa-users text-indigo-400"></i> ผู้เล่นในห้อง (<span id="lobby-player-count">0</span>)
+                        </span>
+                        <span class="text-[10px] text-amber-400 bg-amber-400/10 border border-amber-400/20 px-2 py-0.5 rounded-full">ต้องการผู้เล่นอย่างน้อย 4 คน (ไม่รวม GM)</span>
+                    </div>
+
+                    <div id="lobby-player-list" class="bg-slate-800/60 border border-slate-700 rounded-xl p-2 max-h-56 overflow-y-auto space-y-1.5">
+                        <!-- Players rendered dynamically -->
+                    </div>
+                </div>
+
+                <!-- Start Action Area -->
+                <div id="lobby-host-controls" class="space-y-2 pt-2">
+                    <button id="btn-host-start" onclick="openHostSettings()" disabled class="w-full py-3 bg-gradient-to-r from-emerald-600 to-teal-600 disabled:from-slate-700 disabled:to-slate-800 disabled:text-slate-500 text-white font-bold rounded-xl shadow transition active:scale-95 flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-sliders"></i> ตั้งค่าเวลา & เริ่มเกม
+                    </button>
+                </div>
+
+                <div id="lobby-guest-notice" class="hidden text-center py-2 bg-slate-800/40 rounded-xl border border-slate-700/50">
+                    <p class="text-xs text-indigo-300 animate-pulse">⏳ รอ Game Master ตั้งค่าและเริ่มเกม...</p>
+                </div>
+
+                <button onclick="leaveLobbyRoom()" class="w-full py-2 bg-slate-800/60 hover:bg-slate-800 text-red-400 text-xs font-semibold rounded-lg border border-slate-700 transition">
+                    <i class="fa-solid fa-door-open mr-1"></i> ออกจากห้อง
+                </button>
+            </div>
+
+            <!-- 4. ONLINE GAMEPLAY SCREEN -->
+            <div id="screen-online-gameplay" class="hidden space-y-5 text-center">
+                <!-- Role & Word Badge -->
+                <div class="bg-slate-800/90 border border-slate-700 rounded-xl p-4 shadow-xl">
+                    <div class="text-xs text-slate-400 mb-1">บทบาทของคุณประจำรอบนี้</div>
+                    <div id="play-my-role" class="text-2xl font-black text-indigo-400 uppercase tracking-wide">COMMON</div>
+                    
+                    <div id="play-word-box" class="mt-3 p-3 bg-indigo-950/60 border border-indigo-500/40 rounded-lg">
+                        <span class="text-[11px] text-indigo-300 block">คำศัพท์สลับหาประจำตานี้คือ:</span>
+                        <span id="play-secret-word" class="text-xl font-bold text-emerald-400">???</span>
+                    </div>
+                </div>
+
+                <!-- Timer Section -->
+                <div class="bg-slate-800/60 border border-slate-700 rounded-xl p-4">
+                    <div class="text-xs text-slate-400 mb-1">เวลาคงเหลือประจำรอบ</div>
+                    <div id="game-timer-display" class="text-5xl font-black font-mono text-amber-400 my-1">04:00</div>
+                    
+                    <!-- GM Timer Action Buttons -->
+                    <div id="gm-timer-actions" class="hidden flex gap-2 justify-center mt-3">
+                        <button id="btn-timer-toggle" onclick="toggleOnlineTimer()" class="flex-1 py-2 bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs rounded-lg shadow active:scale-95">
+                            <i class="fa-solid fa-pause mr-1"></i> พักเวลา
+                        </button>
+                        <button onclick="triggerOnlineVoting()" class="flex-1 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-lg shadow active:scale-95">
+                            <i class="fa-solid fa-bullseye mr-1"></i> มีคนตอบถูกแล้ว!
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. ONLINE VOTING PHASE SCREEN -->
+            <div id="screen-online-voting" class="hidden space-y-4 flex flex-col h-full">
+                <!-- Top Revealed Word -->
+                <div class="bg-slate-800/90 border border-slate-700 rounded-xl p-3 text-center shadow">
+                    <span class="text-[11px] text-slate-400 block">เฉลยคำศัพท์ประจำรอบนี้คือ:</span>
+                    <span id="voting-secret-word" class="text-lg font-bold text-emerald-400">---</span>
+                </div>
+
+                <!-- Middle Scrollable Selection Frame -->
+                <div class="flex-1 space-y-2">
+                    <div class="flex justify-between items-center text-xs text-slate-300 px-1">
+                        <span id="voting-header-title" class="font-bold"><i class="fa-solid fa-check-to-slot text-indigo-400"></i> เลือกคนที่คุณสงสัยว่าเป็น Insider:</span>
+                        <span id="vote-status-tag" class="text-[10px] text-slate-400">แตะเพื่อเลือก 1 คน</span>
+                    </div>
+
+                    <div id="voting-player-cards" class="bg-slate-800/50 border border-slate-700/80 rounded-xl p-2.5 max-h-56 overflow-y-auto space-y-2">
+                        <!-- Player choice cards dynamically rendered -->
+                    </div>
+                </div>
+
+                <!-- Bottom Action Confirm Button -->
+                <div class="pt-2">
+                    <button id="btn-confirm-vote" onclick="confirmMyVote()" disabled class="w-full py-3 bg-indigo-600 disabled:bg-slate-800 disabled:text-slate-600 hover:bg-indigo-500 text-white font-bold text-sm rounded-xl shadow transition active:scale-95">
+                        <i class="fa-solid fa-paper-plane mr-1"></i> ยืนยันการโหวต
+                    </button>
+                    <button id="btn-host-end-vote" onclick="hostFinishVoting()" disabled class="hidden w-full py-3 bg-amber-600 disabled:bg-slate-800 disabled:text-slate-600 hover:bg-amber-500 text-white font-bold text-sm rounded-xl shadow transition active:scale-95">
+                        <i class="fa-solid fa-flag-checkered mr-1"></i> สรุปผลการโหวตทั้งหมด (GM)
+                    </button>
+                </div>
+            </div>
+
+            <!-- 6. ONLINE RESULTS SCREEN -->
+            <div id="screen-online-results" class="hidden space-y-4 text-center">
+                <!-- Top Secret Word -->
+                <div class="text-xs text-slate-400">
+                    เฉลยคำศัพท์: <span id="results-secret-word" class="font-bold text-emerald-400">---</span>
+                </div>
+
+                <!-- Middle Top 3 Votes List -->
+                <div class="bg-slate-800/60 border border-slate-700 rounded-xl p-3">
+                    <div class="text-xs font-bold text-amber-300 mb-2 flex items-center justify-center gap-1.5">
+                        <i class="fa-solid fa-trophy"></i> ผลโหวตสูงสุด (Top Voted)
+                    </div>
+                    <div id="results-top-voted" class="space-y-1.5 text-xs">
+                        <!-- Top votes rendered here -->
+                    </div>
+                </div>
+
+                <!-- Bottom Red Eye 3D Flip Card -->
+                <div class="py-2 flex flex-col items-center">
+                    <span class="text-xs text-slate-300 mb-2 font-medium">แตะการ์ดลูกตาเพื่อเปิดเฉลย Insider!</span>
+                    
+                    <div onclick="flipEyeCard(this)" class="w-48 h-32 perspective-1000 cursor-pointer group">
+                        <div id="eye-card-inner" class="relative w-full h-full transform-style-3d shadow-xl rounded-xl">
+                            <!-- Card Front (Red Eye) -->
+                            <div class="absolute inset-0 backface-hidden bg-gradient-to-br from-rose-700 to-red-900 border-2 border-red-500 rounded-xl flex flex-col items-center justify-center p-3 text-white">
+                                <i class="fa-solid fa-eye text-4xl text-red-200 animate-pulse mb-1"></i>
+                                <span class="text-[11px] font-bold tracking-wider">แตะเพื่อพลิกการ์ด</span>
+                            </div>
+                            <!-- Card Back (Revealed Insider Name) -->
+                            <div class="absolute inset-0 backface-hidden rotate-y-180 bg-slate-800 border-2 border-indigo-500 rounded-xl flex flex-col items-center justify-center p-3 text-white">
+                                <span class="text-[10px] text-slate-400 block uppercase">INSIDER ตัวจริงคือ</span>
+                                <span id="revealed-insider-name" class="text-lg font-black text-amber-300 my-0.5">???</span>
+                                <span id="revealed-insider-role" class="text-[10px] bg-amber-400/20 text-amber-300 px-2 py-0.5 rounded-full">ผู้รู้คำตอบประจำรอบ</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- GM Scoreboard Button -->
+                <div id="results-gm-actions" class="hidden pt-2">
+                    <button onclick="goToScoreboard()" class="w-full py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold text-xs rounded-xl shadow active:scale-95 transition">
+                        <i class="fa-solid fa-chart-simple mr-1"></i> ดูตารางคะแนนรวม (Scoreboard)
+                    </button>
+                </div>
+            </div>
+
+            <!-- 7. ONLINE SCOREBOARD SCREEN -->
+            <div id="screen-online-scoreboard" class="hidden space-y-4 text-center">
+                <!-- Round Result Announcement -->
+                <div id="scoreboard-round-summary" class="bg-indigo-950/70 border border-indigo-500/50 rounded-xl p-3 shadow text-xs">
+                    <span class="text-amber-300 font-bold block mb-1">📢 สรุปผลการแข่งขันรอบล่าสุด</span>
+                    <span id="scoreboard-result-text" class="text-slate-200">---</span>
+                </div>
+
+                <!-- Leaderboard Table -->
+                <div class="bg-slate-800/80 border border-slate-700 rounded-xl p-3">
+                    <div class="text-xs font-bold text-indigo-300 mb-3 flex items-center justify-center gap-1.5 border-b border-slate-700/60 pb-2">
+                        <i class="fa-solid fa-ranking-star text-amber-400 text-sm"></i> ตารางคะแนนรวม (Leaderboard)
+                    </div>
+                    <div id="scoreboard-rank-list" class="space-y-2 text-xs max-h-56 overflow-y-auto">
+                        <!-- Rankings rendered dynamically -->
+                    </div>
+                </div>
+
+                <!-- GM Return to Lobby Button -->
+                <div id="scoreboard-gm-actions" class="hidden pt-2">
+                    <button onclick="returnToLobby()" class="w-full py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs rounded-xl shadow active:scale-95 transition">
+                        <i class="fa-solid fa-rotate-right mr-1"></i> กลับหน้า Lobby เพื่อเริ่มรอบใหม่
+                    </button>
+                </div>
+            </div>
+
+            <!-- 8. PASS & PLAY SETUP SCREEN -->
+            <div id="screen-passplay-setup" class="hidden space-y-4">
+                <button onclick="showScreen('screen-main-menu')" class="text-xs text-slate-400 hover:text-white transition flex items-center gap-1">
+                    <i class="fa-solid fa-arrow-left"></i> ย้อนกลับหน้าหลัก
+                </button>
+
+                <div class="bg-slate-800/80 border border-slate-700 rounded-xl p-4 space-y-4">
+                    <h3 class="text-sm font-bold text-slate-200 text-center border-b border-slate-700 pb-2">ตั้งค่าเกม (Pass & Play)</h3>
+                    
+                    <div>
+                        <label class="text-xs text-slate-300 justify-between flex mb-1">
+                            <span>จำนวนผู้เล่นสุ่มบทบาท (ไม่รวม GM):</span>
+                            <span id="off-player-val" class="font-bold text-indigo-400">5 คน</span>
+                        </label>
+                        <input type="range" id="off-player-range" min="4" max="10" value="5" oninput="updatePassPlaySetupUI()" class="w-full accent-indigo-500">
+                        <span class="text-[10px] text-slate-400">ผู้เล่นสุ่มบทบาท 4 - 10 คน</span>
+                    </div>
+
+                    <div>
+                        <label class="text-xs text-slate-300 justify-between flex mb-1">
+                            <span>เวลาต่อรอบ:</span>
+                            <span id="off-time-val" class="font-bold text-purple-400">4 นาที</span>
+                        </label>
+                        <input type="range" id="off-time-range" min="2" max="5" value="4" oninput="updatePassPlaySetupUI()" class="w-full accent-purple-500">
+                    </div>
+
+                    <button onclick="startPassPlayGame()" class="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm rounded-xl shadow active:scale-95 transition">
+                        เริ่มสุ่มบทบาทเลย
+                    </button>
+                </div>
+            </div>
+
+            <!-- PASS & PLAY GM & ROLE SCREENS -->
+            <div id="screen-passplay-gm" class="hidden space-y-4 text-center">
+                <div class="bg-slate-800 border border-amber-500/40 rounded-xl p-4">
+                    <i class="fa-solid fa-crown text-3xl text-amber-400 mb-2"></i>
+                    <h3 class="text-lg font-bold text-amber-300">คุณคือ Game Master</h3>
+                    <p class="text-xs text-slate-300 mt-2">คำศัพท์ประจำรอบนี้คือ:</p>
+                    <div id="off-gm-word" class="text-2xl font-black text-emerald-400 my-2">---</div>
+                    <p class="text-[11px] text-slate-400">จดจำคำศัพท์นี้ไว้ แล้วส่งต่อเครื่องให้ผู้เล่นสุ่มบทบาท</p>
+                </div>
+                <button onclick="showPassPlayPassScreen()" class="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm rounded-xl shadow active:scale-95">
+                    ส่งต่อเครื่องให้ผู้เล่นคนต่อไป
+                </button>
+            </div>
+
+            <div id="screen-passplay-pass" class="hidden space-y-4 text-center">
+                <div class="py-6">
+                    <i class="fa-solid fa-hand-holding-hand text-4xl text-indigo-400 mb-3 animate-bounce"></i>
+                    <h3 class="text-xl font-bold text-slate-100">ส่งเครื่องให้ผู้เล่นคนที่ <span id="off-pass-num" class="text-indigo-400">1</span></h3>
+                    <p class="text-xs text-slate-400 mt-1">กดปุ่มด้านล่างเพื่อแอบดูบทบาทส่วนตัว</p>
+                </div>
+                <button onclick="revealPassPlayRole()" class="w-full py-3 bg-purple-600 hover:bg-purple-500 text-white font-bold text-sm rounded-xl shadow active:scale-95">
+                    แอบดูบทบาท
+                </button>
+            </div>
+
+            <div id="screen-passplay-role" class="hidden space-y-4 text-center">
+                <div class="bg-slate-800 border border-slate-700 rounded-xl p-5">
+                    <span class="text-xs text-slate-400 block mb-1">บทบาทของคุณคือ:</span>
+                    <div id="off-role-display" class="text-2xl font-black text-indigo-400 uppercase">COMMON</div>
+                    
+                    <div id="off-word-area" class="hidden mt-4 p-3 bg-indigo-950/60 border border-indigo-500/40 rounded-lg">
+                        <span class="text-[11px] text-indigo-300 block">คำศัพท์ประจำรอบนี้คือ:</span>
+                        <span id="off-role-word" class="text-xl font-bold text-emerald-400">---</span>
+                    </div>
+                </div>
+                <button onclick="nextPassPlayPlayer()" class="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm rounded-xl shadow active:scale-95">
+                    ดูเสร็จแล้ว (ส่งเครื่องต่อ / เริ่มเล่น)
+                </button>
+            </div>
+
+            <div id="screen-passplay-gameplay" class="hidden space-y-4 text-center">
+                <div class="bg-slate-800 border border-slate-700 rounded-xl p-4">
+                    <span class="text-xs text-slate-400">เวลานับถอยหลัง</span>
+                    <div id="off-timer-display" class="text-5xl font-black font-mono text-amber-400 my-2">04:00</div>
+                    <div class="flex gap-2 mt-3">
+                        <button id="btn-off-timer-toggle" onclick="togglePassPlayTimer()" class="flex-1 py-2 bg-amber-600 text-white font-bold text-xs rounded-lg shadow">
+                            พักเวลา
+                        </button>
+                        <button onclick="resetToMainMenu()" class="flex-1 py-2 bg-slate-700 text-slate-200 font-bold text-xs rounded-lg shadow">
+                            จบเกม / เมนูหลัก
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast-message" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 bg-slate-800/95 border border-indigo-500/60 text-white text-xs px-4 py-2.5 rounded-full shadow-2xl flex items-center gap-2 z-50">
+        <i id="toast-icon" class="fa-solid fa-circle-info text-indigo-400"></i>
+        <span id="toast-text">ข้อความแจ้งเตือน</span>
+    </div>
+
+    <!-- GM Settings Modal -->
+    <div id="modal-settings" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+        <div class="bg-slate-900 border border-slate-700 rounded-2xl p-5 w-full max-w-sm space-y-4 text-slate-100">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+                <h3 class="text-sm font-bold text-indigo-400 flex items-center gap-1.5">
+                    <i class="fa-solid fa-gear"></i> ตั้งค่าเวลาต่อรอบ (Game Master)
+                </h3>
+                <button onclick="closeHostSettings()" class="text-slate-400 hover:text-white text-xs">
+                    <i class="fa-solid fa-xmark text-base"></i>
+                </button>
+            </div>
+
+            <div>
+                <label class="text-xs text-slate-300 justify-between flex mb-1">
+                    <span>เวลาจับถอยหลัง:</span>
+                    <span id="modal-time-val" class="font-bold text-amber-400">4 นาที</span>
+                </label>
+                <input type="range" id="modal-time-range" min="2" max="5" value="4" oninput="document.getElementById('modal-time-val').innerText = this.value + ' นาที'" class="w-full accent-amber-500">
+            </div>
+
+            <div>
+                <label class="text-xs text-slate-300 block mb-1">คำศัพท์สุ่มประจำรอบนี้:</label>
+                <div class="flex gap-2">
+                    <input type="text" id="modal-word-input" readonly class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-1.5 text-sm font-bold text-emerald-400 text-center">
+                    <button onclick="randomizeModalWord()" class="px-3 bg-slate-800 border border-slate-700 hover:bg-slate-700 text-indigo-300 rounded-lg text-xs font-bold active:scale-95 transition">
+                        <i class="fa-solid fa-dice"></i> สุ่มใหม่
+                    </button>
+                </div>
+            </div>
+
+            <button onclick="confirmHostStartGame()" class="w-full py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold text-xs rounded-xl shadow active:scale-95 transition">
+                เริ่มรอบเกมทันที!
+            </button>
+        </div>
+    </div>
+
+    <!-- Firebase Config Modal -->
+    <div id="modal-firebase" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+        <div class="bg-slate-900 border border-slate-700 rounded-2xl p-5 w-full max-w-sm space-y-4 text-slate-100">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+                <h3 class="text-sm font-bold text-indigo-400 flex items-center gap-1.5">
+                    <i class="fa-solid fa-cloud"></i> ตั้งค่า Firebase Online Database
+                </h3>
+                <button onclick="closeFirebaseModal()" class="text-slate-400 hover:text-white text-xs">
+                    <i class="fa-solid fa-xmark text-base"></i>
+                </button>
+            </div>
+
+            <p class="text-xs text-slate-300">แปะ `firebaseConfig` เพื่อซิงค์ผ่านอินเทอร์เน็ตจริงข้ามมือถือทุกเครื่อง:</p>
+            <textarea id="firebase-config-input" rows="5" placeholder='{"apiKey": "...", "databaseURL": "...", "projectId": "..."}' class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 text-xs text-emerald-300 font-mono focus:outline-none focus:border-indigo-500"></textarea>
+
+            <div class="flex gap-2">
+                <button onclick="saveFirebaseConfig()" class="flex-1 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-lg shadow">
+                    บันทึกและเชื่อมต่อ
+                </button>
+                <button onclick="resetFirebaseConfig()" class="py-2 px-3 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs rounded-lg border border-slate-700">
+                    ล้างค่า
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Local word bank is emptied so no words are visible in client-side HTML source code
+        const fallbackWordBank = [];
+
+        let activeWordBank = [];
+
+        // Unique User ID per browser tab (SessionStorage prevents tabs from overwriting each other)
+        let currentUserId = sessionStorage.getItem('insider_user_id') || 'usr_' + Math.random().toString(36).substring(2, 9);
+        sessionStorage.setItem('insider_user_id', currentUserId);
+
+        let currentRoomCode = null;
+        let isHost = false;
+        let roomData = null;
+        let onlineTimerInterval = null;
+        let dbRef = null;
+        let isFirebaseActive = false;
+
+        // BroadcastChannel for instant local multi-tab sync on same machine
+        const roomChannel = typeof BroadcastChannel !== 'undefined' ? new BroadcastChannel('insider_tab_sync') : null;
+        if (roomChannel) {
+            roomChannel.onmessage = (event) => {
+                if (event.data && event.data.code === currentRoomCode) {
+                    roomData = event.data;
+                    updateUIForRoomState(roomData);
+                }
+            };
+        }
+
+        // Local Storage Listener for same-device fallback
+        window.addEventListener('storage', (e) => {
+            if (e.key && e.key.startsWith('insider_room_') && currentRoomCode && e.key.endsWith(currentRoomCode)) {
+                try {
+                    const data = JSON.parse(e.newValue);
+                    if (data) {
+                        roomData = data;
+                        updateUIForRoomState(roomData);
+                    }
+                } catch(err){}
+            }
+        });
+
+        // Embedded User Firebase Configuration
+        const DEFAULT_FIREBASE_CONFIG = {
+            apiKey: "AIzaSyCh8osVcBOTpDdWqpWICJ6LYC0T_9McnbQ",
+            authDomain: "insider-test-58d2a.firebaseapp.com",
+            databaseURL: "https://insider-test-58d2a-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "insider-test-58d2a",
+            storageBucket: "insider-test-58d2a.firebasestorage.app",
+            messagingSenderId: "277014409655",
+            appId: "1:277014409655:web:16f4727b7b5e5089e9b832"
+        };
+
+        // Initialize Firebase if configured
+        function initFirebase() {
+            try {
+                const savedConfig = localStorage.getItem('insider_firebase_config');
+                const config = savedConfig ? JSON.parse(savedConfig) : DEFAULT_FIREBASE_CONFIG;
+                
+                if (config && config.apiKey) {
+                    if (!firebase.apps.length) {
+                        firebase.initializeApp(config);
+                    }
+                    dbRef = firebase.database();
+                    isFirebaseActive = true;
+                    document.getElementById('conn-dot').className = "w-2 h-2 rounded-full bg-emerald-400 animate-ping";
+                    document.getElementById('conn-text').innerText = "เชื่อมต่อ Firebase Online สดแล้ว";
+
+                    // Fetch Word Bank from Firebase backend
+                    fetchWordBankFromFirebase();
+                }
+            } catch(e) {
+                isFirebaseActive = false;
+            }
+        }
+
+        // Fetch Word Bank array from Firebase /wordBank
+        function fetchWordBankFromFirebase(callback) {
+            if (isFirebaseActive && dbRef) {
+                dbRef.ref('wordBank').once('value').then((snapshot) => {
+                    const data = snapshot.val();
+                    if (data) {
+                        if (Array.isArray(data)) {
+                            activeWordBank = data;
+                        } else if (typeof data === 'object') {
+                            activeWordBank = Object.values(data);
+                        }
+                    }
+                    if (callback) callback();
+                }).catch(() => {
+                    if (callback) callback();
+                });
+            } else {
+                if (callback) callback();
+            }
+        }
+
+        // Broadcast or Sync Room Updates
+        function broadcastRoomUpdate(data) {
+            roomData = data;
+            
+            // 1. Sync via Firebase Database if connected
+            if (isFirebaseActive && dbRef && data.code) {
+                dbRef.ref('rooms/' + data.code).set(data);
+            } else {
+                // 2. Fallback to LocalStorage + BroadcastChannel for local testing
+                try {
+                    localStorage.setItem('insider_room_' + data.code, JSON.stringify(data));
+                    if (roomChannel) roomChannel.postMessage(data);
+                } catch(e){}
+            }
+
+            updateUIForRoomState(data);
+        }
+
+        // Subscribe to Room Updates
+        function subscribeToRoom(code) {
+            if (isFirebaseActive && dbRef) {
+                dbRef.ref('rooms/' + code).on('value', (snapshot) => {
+                    const val = snapshot.val();
+                    if (val) {
+                        roomData = val;
+                        updateUIForRoomState(roomData);
+                    }
+                });
+            }
+        }
+
+        function showToast(text, iconClass = "fa-circle-info") {
+            const toast = document.getElementById('toast-message');
+            document.getElementById('toast-text').innerText = text;
+            document.getElementById('toast-icon').className = `fa-solid ${iconClass} text-indigo-400`;
+            toast.classList.remove('hidden');
+            setTimeout(() => { toast.classList.add('hidden'); }, 3000);
+        }
+
+        function showScreen(screenId) {
+            const screens = [
+                'screen-main-menu', 'screen-online-choice', 'screen-online-lobby',
+                'screen-online-gameplay', 'screen-online-voting', 'screen-online-results',
+                'screen-online-scoreboard', 'screen-passplay-setup', 'screen-passplay-gm',
+                'screen-passplay-pass', 'screen-passplay-role', 'screen-passplay-gameplay'
+            ];
+            screens.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.classList.add('hidden');
+            });
+            const target = document.getElementById(screenId);
+            if (target) target.classList.remove('hidden');
+        }
+
+        function goToMode(mode) {
+            if (mode === 'online-choice') {
+                showScreen('screen-online-choice');
+            } else if (mode === 'pass-play') {
+                showScreen('screen-passplay-setup');
+            }
+        }
+
+        function generateRoomCode() {
+            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+            let code = '';
+            for (let i = 0; i < 8; i++) {
+                code += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return code;
+        }
+
+        function createNewRoom() {
+            const hostName = document.getElementById('host-name-input').value.trim();
+            if (!hostName) {
+                showToast("กรุณากรอกชื่อ Game Master ก่อนครับ", "fa-triangle-exclamation");
+                return;
+            }
+
+            currentRoomCode = generateRoomCode();
+            isHost = true;
+
+            const initialWord = activeWordBank[Math.floor(Math.random() * activeWordBank.length)] || "ตู้เย็น";
+
+            const initialRoom = {
+                code: currentRoomCode,
+                status: 'lobby',
+                hostId: currentUserId,
+                hostName: hostName,
+                settings: {
+                    timerMinutes: 4,
+                    secretWord: initialWord
+                },
+                gameplay: {
+                    timeRemainingSec: 240,
+                    isTimerRunning: false,
+                    insiderId: null,
+                    lastRoundSummary: ""
+                },
+                players: {}
+            };
+
+            initialRoom.players[currentUserId] = {
+                id: currentUserId,
+                name: hostName,
+                isHost: true,
+                role: 'GM',
+                score: 0,
+                voteTargetId: null,
+                confirmedVote: false
+            };
+
+            // Quietly increment totalRooms counter in Firebase Backend
+            if (isFirebaseActive && dbRef) {
+                dbRef.ref('stats/totalRooms').transaction((current) => (current || 0) + 1);
+            }
+
+            subscribeToRoom(currentRoomCode);
+            broadcastRoomUpdate(initialRoom);
+            showScreen('screen-online-lobby');
+            showToast(`สร้างห้องเรียบร้อย! Code: ${currentRoomCode}`, "fa-circle-check");
+        }
+
+        function joinExistingRoom() {
+            const code = document.getElementById('join-code-input').value.trim().toUpperCase();
+            const playerName = document.getElementById('join-name-input').value.trim();
+
+            if (!code) {
+                showToast("กรุณากรอกรหัสห้อง 8 ตัวอักษร", "fa-triangle-exclamation");
+                return;
+            }
+            if (!playerName) {
+                showToast("กรุณากรอกชื่อผู้เล่นของคุณ", "fa-triangle-exclamation");
+                return;
+            }
+
+            currentRoomCode = code;
+            isHost = false;
+
+            if (isFirebaseActive && dbRef) {
+                dbRef.ref('rooms/' + code).once('value').then((snapshot) => {
+                    const room = snapshot.val();
+                    processJoin(room, playerName);
+                }).catch((err) => {
+                    showToast("เกิดข้อผิดพลาดในการเชื่อมต่อห้อง", "fa-circle-xmark");
+                });
+            } else {
+                const localData = localStorage.getItem('insider_room_' + code);
+                if (localData) {
+                    try {
+                        const room = JSON.parse(localData);
+                        processJoin(room, playerName);
+                    } catch(e) {
+                        showToast("ไม่พบห้องนี้ในระบบ", "fa-circle-xmark");
+                    }
+                } else {
+                    showToast("ไม่พบห้องนี้ในระบบ", "fa-circle-xmark");
+                }
+            }
+        }
+
+        function processJoin(room, playerName) {
+            if (!room) {
+                showToast("ไม่พบห้องนี้ในระบบ กรุณาเช็กรหัสอีกครั้ง", "fa-circle-xmark");
+                return;
+            }
+            if (room.status !== 'lobby') {
+                showToast("ห้องนี้กำลังดำเนินการเล่นอยู่ ไม่สามารถเข้าร่วมได้", "fa-triangle-exclamation");
+                return;
+            }
+
+            room.players[currentUserId] = {
+                id: currentUserId,
+                name: playerName,
+                isHost: false,
+                role: 'Common',
+                score: 0,
+                voteTargetId: null,
+                confirmedVote: false
+            };
+
+            subscribeToRoom(currentRoomCode);
+            broadcastRoomUpdate(room);
+            showScreen('screen-online-lobby');
+            showToast("เข้าร่วมห้องสำเร็จ!", "fa-circle-check");
+        }
+
+        function copyRoomCode() {
+            if (!currentRoomCode) return;
+            const temp = document.createElement('input');
+            document.body.appendChild(temp);
+            temp.value = currentRoomCode;
+            temp.select();
+            document.execCommand('copy');
+            document.body.removeChild(temp);
+            showToast("ก๊อบปี้รหัสห้องเรียบร้อย!", "fa-copy");
+        }
+
+        function leaveLobbyRoom() {
+            if (roomData && roomData.players) {
+                delete roomData.players[currentUserId];
+                broadcastRoomUpdate(roomData);
+            }
+            currentRoomCode = null;
+            showScreen('screen-main-menu');
+        }
+
+        function updateUIForRoomState(data) {
+            if (!data) return;
+
+            document.getElementById('lobby-room-code').innerText = data.code;
+            const playersArr = Object.values(data.players || {});
+            
+            // Player count excluding GM
+            const nonGmCount = playersArr.filter(p => !p.isHost).length;
+            document.getElementById('lobby-player-count').innerText = `${playersArr.length} คน (ผู้เล่นสุ่ม ${nonGmCount} คน)`;
+
+            // Render Player List in Lobby
+            const listEl = document.getElementById('lobby-player-list');
+            if (listEl) {
+                listEl.innerHTML = playersArr.map(p => `
+                    <div class="flex items-center justify-between p-2 rounded-lg bg-slate-800/80 border border-slate-700/60 text-xs">
+                        <div class="flex items-center gap-2">
+                            ${p.isHost ? '<i class="fa-solid fa-crown text-amber-400"></i>' : '<i class="fa-solid fa-user text-indigo-400"></i>'}
+                            <span class="font-bold ${p.id === currentUserId ? 'text-indigo-300' : 'text-slate-200'}">${p.name} ${p.id === currentUserId ? '(คุณ)' : ''}</span>
+                        </div>
+                        <span class="text-[10px] px-2 py-0.5 rounded-full ${p.isHost ? 'bg-amber-400/20 text-amber-300' : 'bg-slate-700 text-slate-400'}">
+                            ${p.isHost ? 'GM' : 'Score: ' + (p.score || 0)}
+                        </span>
+                    </div>
+                `).join('');
+            }
+
+            // Enable host start button if players >= 4 (excluding GM)
+            const hostBtn = document.getElementById('btn-host-start');
+            if (hostBtn) {
+                hostBtn.disabled = nonGmCount < 4;
+            }
+
+            // Screen State Switcher
+            if (data.status === 'lobby') {
+                showScreen('screen-online-lobby');
+                const isMeHost = data.hostId === currentUserId;
+                document.getElementById('lobby-host-controls').classList.toggle('hidden', !isMeHost);
+                document.getElementById('lobby-guest-notice').classList.toggle('hidden', isMeHost);
+            } else if (data.status === 'playing') {
+                showScreen('screen-online-gameplay');
+                setupGameplayUI(data);
+            } else if (data.status === 'voting') {
+                showScreen('screen-online-voting');
+                setupVotingUI(data);
+            } else if (data.status === 'results') {
+                showScreen('screen-online-results');
+                setupResultsUI(data);
+            } else if (data.status === 'scoreboard') {
+                showScreen('screen-online-scoreboard');
+                setupScoreboardUI(data);
+            }
+        }
+
+        function openHostSettings() {
+            fetchWordBankFromFirebase(() => {
+                randomizeModalWord();
+                document.getElementById('modal-settings').classList.remove('hidden');
+            });
+        }
+
+        function closeHostSettings() {
+            document.getElementById('modal-settings').classList.add('hidden');
+        }
+
+        function randomizeModalWord() {
+            if (activeWordBank.length === 0) {
+                showToast("กำลังโหลดคำศัพท์จาก Firebase...", "fa-spinner animate-spin");
+                fetchWordBankFromFirebase(() => {
+                    const word = activeWordBank[Math.floor(Math.random() * activeWordBank.length)] || "ไม่มีคำศัพท์ในระบบ";
+                    document.getElementById('modal-word-input').value = word;
+                });
+                return;
+            }
+            const word = activeWordBank[Math.floor(Math.random() * activeWordBank.length)] || "ไม่มีคำศัพท์ในระบบ";
+            document.getElementById('modal-word-input').value = word;
+        }
+
+        function confirmHostStartGame() {
+            const timerMins = parseInt(document.getElementById('modal-time-range').value);
+            const secretWord = document.getElementById('modal-word-input').value;
+
+            // Assign roles only to non-GM players
+            const playerIds = Object.keys(roomData.players).filter(id => id !== roomData.hostId);
+            const insiderIndex = Math.floor(Math.random() * playerIds.length);
+            const insiderId = playerIds[insiderIndex];
+
+            Object.keys(roomData.players).forEach(id => {
+                if (id === roomData.hostId) {
+                    roomData.players[id].role = 'GM';
+                } else if (id === insiderId) {
+                    roomData.players[id].role = 'Insider';
+                } else {
+                    roomData.players[id].role = 'Common';
+                }
+                roomData.players[id].voteTargetId = null;
+                roomData.players[id].confirmedVote = false;
+                // Preserve score across rounds
+                if (roomData.players[id].score === undefined) {
+                    roomData.players[id].score = 0;
+                }
+            });
+
+            roomData.settings.timerMinutes = timerMins;
+            roomData.settings.secretWord = secretWord;
+            roomData.gameplay.timeRemainingSec = timerMins * 60;
+            roomData.gameplay.isTimerRunning = true;
+            roomData.gameplay.insiderId = insiderId;
+            roomData.status = 'playing';
+
+            closeHostSettings();
+            broadcastRoomUpdate(roomData);
+            startOnlineTimer();
+        }
+
+        function setupGameplayUI(data) {
+            const myPlayer = data.players[currentUserId] || {};
+            document.getElementById('play-my-role').innerText = myPlayer.role || 'COMMON';
+
+            const wordBox = document.getElementById('play-secret-word');
+            if (myPlayer.role === 'GM' || myPlayer.role === 'Insider') {
+                wordBox.innerText = data.settings.secretWord;
+                wordBox.className = "text-xl font-bold text-emerald-400";
+            } else {
+                wordBox.innerText = "??? (คำถามปิดลับ)";
+                wordBox.className = "text-xl font-bold text-slate-500";
+            }
+
+            const gmActions = document.getElementById('gm-timer-actions');
+            gmActions.classList.toggle('hidden', data.hostId !== currentUserId);
+
+            updateTimerDisplay(data.gameplay.timeRemainingSec);
+            if (data.gameplay.isTimerRunning && !onlineTimerInterval) {
+                startOnlineTimer();
+            }
+        }
+
+        function updateTimerDisplay(sec) {
+            const m = Math.floor(sec / 60).toString().padStart(2, '0');
+            const s = (sec % 60).toString().padStart(2, '0');
+            const el = document.getElementById('game-timer-display');
+            if (el) el.innerText = `${m}:${s}`;
+        }
+
+        function startOnlineTimer() {
+            if (onlineTimerInterval) clearInterval(onlineTimerInterval);
+            onlineTimerInterval = setInterval(() => {
+                if (roomData && roomData.status === 'playing' && roomData.gameplay.isTimerRunning) {
+                    if (roomData.gameplay.timeRemainingSec > 0) {
+                        roomData.gameplay.timeRemainingSec--;
+                        updateTimerDisplay(roomData.gameplay.timeRemainingSec);
+                    } else {
+                        clearInterval(onlineTimerInterval);
+                        onlineTimerInterval = null;
+                        if (roomData.hostId === currentUserId) {
+                            triggerOnlineVoting();
+                        }
+                    }
+                }
+            }, 1000);
+        }
+
+        function toggleOnlineTimer() {
+            if (!roomData) return;
+            roomData.gameplay.isTimerRunning = !roomData.gameplay.isTimerRunning;
+            const btn = document.getElementById('btn-timer-toggle');
+            if (btn) {
+                btn.innerHTML = roomData.gameplay.isTimerRunning ? '<i class="fa-solid fa-pause mr-1"></i> พักเวลา' : '<i class="fa-solid fa-play mr-1"></i> เล่นต่อ';
+            }
+            broadcastRoomUpdate(roomData);
+        }
+
+        function triggerOnlineVoting() {
+            if (onlineTimerInterval) clearInterval(onlineTimerInterval);
+            onlineTimerInterval = null;
+            if (!roomData) return;
+            roomData.status = 'voting';
+            roomData.gameplay.isTimerRunning = false;
+            broadcastRoomUpdate(roomData);
+        }
+
+        let pendingVoteTargetId = null;
+
+        function setupVotingUI(data) {
+            document.getElementById('voting-secret-word').innerText = data.settings.secretWord;
+            
+            const cardsContainer = document.getElementById('voting-player-cards');
+            const candidates = Object.values(data.players).filter(p => !p.isHost);
+            const isHostMe = data.hostId === currentUserId;
+
+            const headerTitle = document.getElementById('voting-header-title');
+            const statusTag = document.getElementById('vote-status-tag');
+            const btnConfirm = document.getElementById('btn-confirm-vote');
+            const btnHostEnd = document.getElementById('btn-host-end-vote');
+
+            if (isHostMe) {
+                // GM View: Show voting status of candidates
+                headerTitle.innerHTML = '<i class="fa-solid fa-spinner text-amber-400 animate-spin"></i> สถานะการโหวตของผู้เล่น:';
+                statusTag.innerText = "GM ไม่ต้องโหวต";
+                
+                cardsContainer.innerHTML = candidates.map(p => `
+                    <div class="flex items-center justify-between p-3 rounded-xl bg-slate-800/80 border border-slate-700/80">
+                        <span class="text-xs font-bold text-slate-200">${p.name}</span>
+                        <span class="text-[11px] px-2.5 py-0.5 rounded-full font-bold ${p.confirmedVote ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40' : 'bg-amber-500/20 text-amber-300 border border-amber-500/40'}">
+                            ${p.confirmedVote ? '<i class="fa-solid fa-circle-check text-xs"></i> โหวตแล้ว' : '<i class="fa-solid fa-clock text-xs"></i> กำลังเลือก...'}
+                        </span>
+                    </div>
+                `).join('');
+
+                btnConfirm.classList.add('hidden');
+                btnHostEnd.classList.remove('hidden');
+
+                // GM button disabled until ALL players confirmed votes
+                const confirmedCount = candidates.filter(p => p.confirmedVote).length;
+                const totalNonGm = candidates.length;
+                const allConfirmed = totalNonGm > 0 && confirmedCount === totalNonGm;
+
+                btnHostEnd.disabled = !allConfirmed;
+                btnHostEnd.innerHTML = allConfirmed 
+                    ? `<i class="fa-solid fa-flag-checkered mr-1"></i> สรุปผลการโหวตทั้งหมด (${confirmedCount}/${totalNonGm})`
+                    : `<i class="fa-solid fa-lock mr-1"></i> รอผู้เล่นโหวตครบก่อน (${confirmedCount}/${totalNonGm})`;
+
+            } else {
+                // Non-GM Player View: Candidate cards
+                headerTitle.innerHTML = '<i class="fa-solid fa-check-to-slot text-indigo-400"></i> เลือกคนที่คุณสงสัยว่าเป็น Insider:';
+                statusTag.innerText = "แตะเพื่อเลือก 1 คน";
+
+                cardsContainer.innerHTML = candidates.map(p => `
+                    <div onclick="selectVoteCandidate('${p.id}')" id="vote-card-${p.id}" class="vote-candidate-card flex items-center justify-between p-3 rounded-xl border transition cursor-pointer ${pendingVoteTargetId === p.id ? 'bg-indigo-600/30 border-indigo-500' : 'bg-slate-800/80 border-slate-700/80 hover:border-slate-600'}">
+                        <span class="text-xs font-bold text-slate-200">${p.name} ${p.id === currentUserId ? '(คุณ)' : ''}</span>
+                        <div class="w-5 h-5 rounded-full border border-slate-500 flex items-center justify-center ${pendingVoteTargetId === p.id ? 'bg-indigo-500 border-indigo-400' : ''}">
+                            ${pendingVoteTargetId === p.id ? '<i class="fa-solid fa-check text-[10px] text-white"></i>' : ''}
+                        </div>
+                    </div>
+                `).join('');
+
+                btnConfirm.classList.remove('hidden');
+                btnHostEnd.classList.add('hidden');
+
+                const myPlayer = data.players[currentUserId];
+                if (myPlayer && myPlayer.confirmedVote) {
+                    btnConfirm.disabled = true;
+                    btnConfirm.innerText = "กดยืนยันโหวตเรียบร้อยแล้ว";
+                } else {
+                    btnConfirm.disabled = !pendingVoteTargetId;
+                    btnConfirm.innerText = "ยืนยันการโหวต";
+                }
+            }
+        }
+
+        function selectVoteCandidate(targetId) {
+            if (roomData && roomData.players[currentUserId] && (roomData.players[currentUserId].isHost || roomData.players[currentUserId].confirmedVote)) return;
+            pendingVoteTargetId = targetId;
+            setupVotingUI(roomData);
+        }
+
+        function confirmMyVote() {
+            if (!pendingVoteTargetId || !roomData) return;
+            roomData.players[currentUserId].voteTargetId = pendingVoteTargetId;
+            roomData.players[currentUserId].confirmedVote = true;
+            broadcastRoomUpdate(roomData);
+            showToast("บันทึกการโหวตของคุณเรียบร้อย!", "fa-circle-check");
+        }
+
+        function hostFinishVoting() {
+            if (!roomData) return;
+
+            // 1. Calculate Vote Tally
+            const counts = {};
+            Object.values(roomData.players).forEach(p => {
+                if (p.voteTargetId) {
+                    counts[p.voteTargetId] = (counts[p.voteTargetId] || 0) + 1;
+                }
+            });
+
+            const maxVotes = Math.max(...Object.values(counts), 0);
+            const insiderId = roomData.gameplay.insiderId;
+            const insiderVotes = counts[insiderId] || 0;
+            const insiderPlayer = roomData.players[insiderId];
+
+            // 2. Score Rules:
+            // Rule 3.1: If Insider is tied or top voted #1, all Commons +1
+            // Rule 3.2: If Insider is NOT top voted #1, Insider +1
+            const isInsiderTopVoted = maxVotes > 0 && insiderVotes === maxVotes;
+
+            if (isInsiderTopVoted) {
+                // Common players win!
+                Object.values(roomData.players).forEach(p => {
+                    if (p.role === 'Common') {
+                        p.score = (p.score || 0) + 1;
+                    }
+                });
+                roomData.gameplay.lastRoundSummary = `🎉 Insider (${insiderPlayer ? insiderPlayer.name : ''}) ถูกโหวตจับได้สำเร็จ! ผู้เล่น Common ทุกคนได้ +1 คะแนน`;
+            } else {
+                // Insider escaped!
+                if (insiderPlayer) {
+                    insiderPlayer.score = (insiderPlayer.score || 0) + 1;
+                }
+                roomData.gameplay.lastRoundSummary = `🕵️‍♂️ Insider (${insiderPlayer ? insiderPlayer.name : ''}) รอดตัวจากการโหวต! ได้รับ +1 คะแนนเพียงคนเดียว`;
+            }
+
+            // Quietly increment totalGamesPlayed counter in Firebase Backend
+            if (isFirebaseActive && dbRef) {
+                dbRef.ref('stats/totalGamesPlayed').transaction((current) => (current || 0) + 1);
+            }
+
+            roomData.status = 'results';
+            broadcastRoomUpdate(roomData);
+        }
+
+        function setupResultsUI(data) {
+            document.getElementById('results-secret-word').innerText = data.settings.secretWord;
+
+            // Vote Count Tally
+            const counts = {};
+            Object.values(data.players).forEach(p => {
+                if (p.voteTargetId) {
+                    counts[p.voteTargetId] = (counts[p.voteTargetId] || 0) + 1;
+                }
+            });
+
+            const sorted = Object.keys(counts).map(id => ({
+                id,
+                name: data.players[id] ? data.players[id].name : 'Unknown',
+                count: counts[id]
+            })).sort((a, b) => b.count - a.count);
+
+            const topContainer = document.getElementById('results-top-voted');
+            if (sorted.length === 0) {
+                topContainer.innerHTML = '<span class="text-slate-500">ไม่มีผลโหวตในรอบนี้</span>';
+            } else {
+                topContainer.innerHTML = sorted.slice(0, 3).map((item, idx) => `
+                    <div class="flex items-center justify-between p-2 rounded-lg bg-slate-800/80 border border-slate-700/60">
+                        <span class="font-bold text-slate-200">#${idx + 1} ${item.name}</span>
+                        <span class="bg-indigo-500/20 text-indigo-300 px-2 py-0.5 rounded-full font-bold">${item.count} คะแนน</span>
+                    </div>
+                `).join('');
+            }
+
+            // Insider Reveal Name
+            const insiderPlayer = Object.values(data.players).find(p => p.role === 'Insider');
+            document.getElementById('revealed-insider-name').innerText = insiderPlayer ? insiderPlayer.name : 'ไม่มี';
+
+            // Reset Card Flip State
+            const cardInner = document.getElementById('eye-card-inner');
+            if (cardInner) cardInner.classList.remove('rotate-y-180');
+
+            const isHostMe = data.hostId === currentUserId;
+            document.getElementById('results-gm-actions').classList.toggle('hidden', !isHostMe);
+        }
+
+        function goToScoreboard() {
+            if (!roomData) return;
+            roomData.status = 'scoreboard';
+            broadcastRoomUpdate(roomData);
+        }
+
+        function setupScoreboardUI(data) {
+            document.getElementById('scoreboard-result-text').innerText = data.gameplay.lastRoundSummary || "ไม่มีสรุปผลในรอบนี้";
+
+            // Rank players by score descending (excluding GM)
+            const rankedPlayers = Object.values(data.players)
+                .filter(p => !p.isHost)
+                .sort((a, b) => (b.score || 0) - (a.score || 0));
+
+            const rankContainer = document.getElementById('scoreboard-rank-list');
+            rankContainer.innerHTML = rankedPlayers.map((p, idx) => {
+                let medal = `<span class="text-slate-400 font-bold px-2">#${idx + 1}</span>`;
+                if (idx === 0) medal = '<i class="fa-solid fa-medal text-amber-400 text-base px-1"></i>';
+                else if (idx === 1) medal = '<i class="fa-solid fa-medal text-slate-300 text-base px-1"></i>';
+                else if (idx === 2) medal = '<i class="fa-solid fa-medal text-amber-600 text-base px-1"></i>';
+
+                return `
+                    <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-800/90 border border-slate-700/80">
+                        <div class="flex items-center gap-2">
+                            ${medal}
+                            <span class="font-bold ${p.id === currentUserId ? 'text-indigo-300' : 'text-slate-100'}">${p.name} ${p.id === currentUserId ? '(คุณ)' : ''}</span>
+                        </div>
+                        <span class="bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 px-3 py-1 rounded-full font-extrabold text-xs">
+                            ${p.score || 0} คะแนน
+                        </span>
+                    </div>
+                `;
+            }).join('');
+
+            const isHostMe = data.hostId === currentUserId;
+            document.getElementById('scoreboard-gm-actions').classList.toggle('hidden', !isHostMe);
+        }
+
+        function flipEyeCard(wrapper) {
+            const cardInner = document.getElementById('eye-card-inner');
+            if (cardInner) {
+                cardInner.classList.toggle('rotate-y-180');
+            }
+        }
+
+        function returnToLobby() {
+            if (!roomData) return;
+            roomData.status = 'lobby';
+            broadcastRoomUpdate(roomData);
+        }
+
+        let offPlayerCount = 5;
+        let offGameMinutes = 4;
+        let offCurrentWord = "";
+        let offRoles = [];
+        let offCurrentPlayerIndex = 0;
+        let offTimerSec = 240;
+        let offTimerInterval = null;
+
+        function updatePassPlaySetupUI() {
+            offPlayerCount = parseInt(document.getElementById('off-player-range').value);
+            offGameMinutes = parseInt(document.getElementById('off-time-range').value);
+            document.getElementById('off-player-val').innerText = offPlayerCount + " คน";
+            document.getElementById('off-time-val').innerText = offGameMinutes + " นาที";
+        }
+
+        function startPassPlayGame() {
+            if (activeWordBank.length === 0) {
+                showToast("กรุณาเชื่อมต่อ Firebase เพื่อดึงคำศัพท์", "fa-triangle-exclamation");
+                return;
+            }
+            offCurrentWord = activeWordBank[Math.floor(Math.random() * activeWordBank.length)] || "ไม่มีคำศัพท์ในระบบ";
+            offRoles = ['Insider'];
+            for (let i = 1; i < offPlayerCount; i++) {
+                offRoles.push('Common');
+            }
+            offRoles.sort(() => Math.random() - 0.5);
+
+            document.getElementById('off-gm-word').innerText = offCurrentWord;
+            showScreen('screen-passplay-gm');
+        }
+
+        function showPassPlayPassScreen() {
+            offCurrentPlayerIndex = 0;
+            document.getElementById('off-pass-num').innerText = offCurrentPlayerIndex + 1;
+            showScreen('screen-passplay-pass');
+        }
+
+        function revealPassPlayRole() {
+            const role = offRoles[offCurrentPlayerIndex];
+            document.getElementById('off-role-display').innerText = role;
+
+            const wordArea = document.getElementById('off-word-area');
+            if (role === 'Insider') {
+                document.getElementById('off-role-word').innerText = offCurrentWord;
+                wordArea.classList.remove('hidden');
+            } else {
+                wordArea.classList.add('hidden');
+            }
+            showScreen('screen-passplay-role');
+        }
+
+        function nextPassPlayPlayer() {
+            offCurrentPlayerIndex++;
+            if (offCurrentPlayerIndex < offRoles.length) {
+                document.getElementById('off-pass-num').innerText = offCurrentPlayerIndex + 1;
+                showScreen('screen-passplay-pass');
+            } else {
+                startPassPlayTimer();
+                showScreen('screen-passplay-gameplay');
+            }
+        }
+
+        function startPassPlayTimer() {
+            offTimerSec = offGameMinutes * 60;
+            if (offTimerInterval) clearInterval(offTimerInterval);
+            updatePassPlayTimerDisplay();
+            offTimerInterval = setInterval(() => {
+                if (offTimerSec > 0) {
+                    offTimerSec--;
+                    updatePassPlayTimerDisplay();
+                } else {
+                    clearInterval(offTimerInterval);
+                    showToast("หมดเวลาแล้ว!", "fa-clock");
+                }
+            }, 1000);
+        }
+
+        function updatePassPlayTimerDisplay() {
+            const m = Math.floor(offTimerSec / 60).toString().padStart(2, '0');
+            const s = (sec % 60).toString().padStart(2, '0');
+            document.getElementById('off-timer-display').innerText = `${m}:${s}`;
+        }
+
+        function togglePassPlayTimer() {
+            if (offTimerInterval) {
+                clearInterval(offTimerInterval);
+                offTimerInterval = null;
+                document.getElementById('btn-off-timer-toggle').innerText = "เล่นต่อ";
+            } else {
+                offTimerInterval = setInterval(() => {
+                    if (offTimerSec > 0) {
+                        offTimerSec--;
+                        updatePassPlayTimerDisplay();
+                    } else {
+                        clearInterval(offTimerInterval);
+                    }
+                }, 1000);
+                document.getElementById('btn-off-timer-toggle').innerText = "พักเวลา";
+            }
+        }
+
+        function resetToMainMenu() {
+            if (offTimerInterval) clearInterval(offTimerInterval);
+            showScreen('screen-main-menu');
+        }
+
+        function openFirebaseModal() {
+            document.getElementById('modal-firebase').classList.remove('hidden');
+        }
+
+        function closeFirebaseModal() {
+            document.getElementById('modal-firebase').classList.add('hidden');
+        }
+
+        function saveFirebaseConfig() {
+            const input = document.getElementById('firebase-config-input').value.trim();
+            if (!input) {
+                showToast("กรุณากรอก Firebase Config JSON", "fa-triangle-exclamation");
+                return;
+            }
+            try {
+                JSON.parse(input);
+                localStorage.setItem('insider_firebase_config', input);
+                closeFirebaseModal();
+                initFirebase();
+                showToast("ตั้งค่า Firebase เรียบร้อย!", "fa-circle-check");
+            } catch(e) {
+                showToast("รูปแบบ JSON ไม่ถูกต้อง กรุณาตรวจสอบอีกครั้ง", "fa-triangle-exclamation");
+            }
+        }
+
+        function resetFirebaseConfig() {
+            localStorage.removeItem('insider_firebase_config');
+            location.reload();
+        }
+
+        window.onload = function() {
+            initFirebase();
+            showScreen('screen-main-menu');
+        };
+    </script>
+</body>
+</html>
