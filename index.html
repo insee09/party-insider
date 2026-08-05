@@ -65,7 +65,7 @@
                     INSIDER GAME
                 </h1>
             </div>
-            <span class="text-[10px] tracking-widest text-indigo-300/70 font-mono block mt-0.5">V2.3 MULTI-DEVICE & PASS-PLAY</span>
+            <span class="text-[10px] tracking-widest text-indigo-300/70 font-mono block mt-0.5">V2.0 MULTI-DEVICE & PASS-PLAY</span>
         </header>
 
         <!-- Dynamic Screen Container -->
@@ -149,13 +149,6 @@
                     </div>
                     <button onclick="joinExistingRoom()" class="w-full py-2.5 bg-purple-600 hover:bg-purple-500 text-white font-bold text-sm rounded-lg shadow active:scale-95 transition flex items-center justify-center gap-2">
                         <i class="fa-solid fa-gamepad"></i> เข้าห้องเกม
-                    </button>
-                </div>
-
-                <!-- Database Info Box -->
-                <div class="text-center pt-1">
-                    <button onclick="openFirebaseModal()" class="text-xs text-indigo-400 hover:underline flex items-center justify-center gap-1 mx-auto">
-                        <i class="fa-solid fa-cloud text-xs"></i> ตั้งค่า Firebase Database
                     </button>
                 </div>
             </div>
@@ -469,32 +462,6 @@
         </div>
     </div>
 
-    <!-- Firebase Config Modal -->
-    <div id="modal-firebase" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-        <div class="bg-slate-900 border border-slate-700 rounded-2xl p-5 w-full max-w-sm space-y-4 text-slate-100">
-            <div class="flex justify-between items-center border-b border-slate-800 pb-2">
-                <h3 class="text-sm font-bold text-indigo-400 flex items-center gap-1.5">
-                    <i class="fa-solid fa-cloud"></i> ตั้งค่า Firebase Online Database
-                </h3>
-                <button onclick="closeFirebaseModal()" class="text-slate-400 hover:text-white text-xs">
-                    <i class="fa-solid fa-xmark text-base"></i>
-                </button>
-            </div>
-
-            <p class="text-xs text-slate-300">แปะ `firebaseConfig` เพื่อซิงค์ผ่านอินเทอร์เน็ตจริงข้ามมือถือทุกเครื่อง:</p>
-            <textarea id="firebase-config-input" rows="5" placeholder='{"apiKey": "...", "databaseURL": "...", "projectId": "..."}' class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 text-xs text-emerald-300 font-mono focus:outline-none focus:border-indigo-500"></textarea>
-
-            <div class="flex gap-2">
-                <button onclick="saveFirebaseConfig()" class="flex-1 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-lg shadow">
-                    บันทึกและเชื่อมต่อ
-                </button>
-                <button onclick="resetFirebaseConfig()" class="py-2 px-3 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs rounded-lg border border-slate-700">
-                    ล้างค่า
-                </button>
-            </div>
-        </div>
-    </div>
-
     <script>
         // Local word bank is emptied so no words are visible in client-side HTML source code
         const fallbackWordBank = [];
@@ -536,7 +503,7 @@
             }
         });
 
-        // Embedded User Firebase Configuration
+        // Embedded User Firebase Configuration (Managed strictly in code)
         const DEFAULT_FIREBASE_CONFIG = {
             apiKey: "AIzaSyCh8osVcBOTpDdWqpWICJ6LYC0T_9McnbQ",
             authDomain: "insider-test-58d2a.firebaseapp.com",
@@ -547,12 +514,10 @@
             appId: "1:277014409655:web:16f4727b7b5e5089e9b832"
         };
 
-        // Initialize Firebase if configured
+        // Initialize Firebase
         function initFirebase() {
             try {
-                const savedConfig = localStorage.getItem('insider_firebase_config');
-                const config = savedConfig ? JSON.parse(savedConfig) : DEFAULT_FIREBASE_CONFIG;
-                
+                const config = DEFAULT_FIREBASE_CONFIG;
                 if (config && config.apiKey) {
                     if (!firebase.apps.length) {
                         firebase.initializeApp(config);
@@ -1300,36 +1265,6 @@
         function resetToMainMenu() {
             if (offTimerInterval) clearInterval(offTimerInterval);
             showScreen('screen-main-menu');
-        }
-
-        function openFirebaseModal() {
-            document.getElementById('modal-firebase').classList.remove('hidden');
-        }
-
-        function closeFirebaseModal() {
-            document.getElementById('modal-firebase').classList.add('hidden');
-        }
-
-        function saveFirebaseConfig() {
-            const input = document.getElementById('firebase-config-input').value.trim();
-            if (!input) {
-                showToast("กรุณากรอก Firebase Config JSON", "fa-triangle-exclamation");
-                return;
-            }
-            try {
-                JSON.parse(input);
-                localStorage.setItem('insider_firebase_config', input);
-                closeFirebaseModal();
-                initFirebase();
-                showToast("ตั้งค่า Firebase เรียบร้อย!", "fa-circle-check");
-            } catch(e) {
-                showToast("รูปแบบ JSON ไม่ถูกต้อง กรุณาตรวจสอบอีกครั้ง", "fa-triangle-exclamation");
-            }
-        }
-
-        function resetFirebaseConfig() {
-            localStorage.removeItem('insider_firebase_config');
-            location.reload();
         }
 
         window.onload = function() {
