@@ -72,10 +72,30 @@
             
             <!-- Brand Logo -->
             <div class="flex items-center gap-3 cursor-pointer" onclick="showView('hub')">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 flex items-center justify-center text-white text-xl font-black shadow-lg shadow-indigo-500/30">
-                    <i class="fa-solid fa-dice-d20"></i>
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 flex items-center justify-center text-white shadow-lg shadow-indigo-500/30 p-1.5">
+                    <!-- 3D Isometric Dice SVG (เห็นลูกเต๋า 3 ด้าน) -->
+                    <svg viewBox="0 0 100 100" class="w-full h-full filter drop-shadow">
+                        <!-- ด้านบน (Top Face) -->
+                        <polygon points="50,10 85,30 50,50 15,30" fill="#ffffff" opacity="0.95" />
+                        <!-- ด้านซ้าย (Left Face) -->
+                        <polygon points="15,30 50,50 50,90 15,70" fill="#e0e7ff" opacity="0.85" />
+                        <!-- ด้านขวา (Right Face) -->
+                        <polygon points="50,50 85,30 85,70 50,90" fill="#c7d2fe" opacity="0.75" />
+
+                        <!-- แต้มลูกเต๋า ด้านบน (1 แต้ม) -->
+                        <circle cx="50" cy="30" r="4.5" fill="#4338ca" />
+
+                        <!-- แต้มลูกเต๋า ด้านซ้าย (3 แต้ม) -->
+                        <circle cx="27" cy="47" r="3.5" fill="#4338ca" />
+                        <circle cx="32.5" cy="60" r="3.5" fill="#4338ca" />
+                        <circle cx="38" cy="73" r="3.5" fill="#4338ca" />
+
+                        <!-- แต้มลูกเต๋า ด้านขวา (2 แต้ม) -->
+                        <circle cx="62" cy="50" r="3.5" fill="#4338ca" />
+                        <circle cx="73" cy="70" r="3.5" fill="#4338ca" />
+                    </svg>
                 </div>
-                <div>
+                <div>                    
                     <h1 class="text-lg font-black tracking-wider bg-gradient-to-r from-indigo-400 via-purple-300 to-pink-400 bg-clip-text text-transparent leading-none">
                         BOARD GAME HUB
                     </h1>
