@@ -213,9 +213,9 @@
                     <div class="relative h-44 bg-slate-950 flex items-center justify-center overflow-hidden">
                         <div class="absolute inset-0 bg-black/20 group-hover:bg-black/0 transition-colors z-10"></div>
                         <img src="https://cdn.discordapp.com/attachments/910019505244241921/1546742926468448328/0d10dc03a3f945e1.png?ex=6aa0e41a&is=6a9f929a&hm=457f61a41cd9d09e3e2e2d9d3f8982064121dc02908e98b681f4cc2be16193d9&" 
-                              alt="Werewolf Game" 
-                              class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500"
-                              onerror="this.onerror=null; this.src='https://placehold.co/400x200/1e1b4b/fda4af?text=Werewolf+Game';">
+                             alt="Werewolf Game" 
+                             class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500"
+                             onerror="this.onerror=null; this.src='https://placehold.co/400x200/1e1b4b/fda4af?text=Werewolf+Game';">
                         <span class="absolute top-3 left-3 bg-rose-600 text-white text-[10px] font-extrabold px-2.5 py-1 rounded-full uppercase tracking-wider shadow z-20">
                             มาใหม่ 🐺
                         </span>
@@ -241,7 +241,7 @@
                         </div>
 
                         <div class="flex gap-2 pt-1">
-                            <button onclick="launchGame('Werewolf_game.html', 'Werewolf Game')" class="flex-1 py-3 bg-gradient-to-r from-rose-600 via-purple-600 to-indigo-600 hover:from-rose-500 hover:to-indigo-500 text-white font-bold text-xs rounded-xl shadow-lg active:scale-95 transition flex items-center justify-center gap-1.5">
+                            <button onclick="launchGame('werewolf_game.html', 'Werewolf Game')" class="flex-1 py-3 bg-gradient-to-r from-rose-600 via-purple-600 to-indigo-600 hover:from-rose-500 hover:to-indigo-500 text-white font-bold text-xs rounded-xl shadow-lg active:scale-95 transition flex items-center justify-center gap-1.5">
                                 <i class="fa-solid fa-play"></i> เปิดเข้าเล่นเกม
                             </button>
                             <button onclick="openHowToPlayModal('werewolf')" class="px-3 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs rounded-xl border border-slate-700 transition" title="วิธีเล่น">
@@ -275,7 +275,7 @@
                             กำลังพัฒนา...
                         </button>
                     </div>
-              </div>
+                </div>
 
             </div>
         </div>
@@ -778,7 +778,7 @@
             });
         }
 
-        // [9.12 ฟังก์ชัน Quick Join เข้าห้องเกม (แก้ไขเชื่อมต่อกับ Werewolf_game.html และเช็คห้องใน Firebase)]
+        // [9.12 ฟังก์ชัน Quick Join เข้าห้องเกม (แก้ไขเชื่อมต่อกับ werewolf_game.html และเช็คห้องใน Firebase)]
         function quickJoinFromHub() {
             const code = document.getElementById('hub-quick-code').value.trim().toUpperCase();
             if (!code || code.length !== 8) {
@@ -800,7 +800,7 @@
         function checkAndJoinRoom(code) {
             if (!isFirebaseInitialized) {
                 showToastHub("กำลังเปิดห้องเกมในโหมดออฟไลน์...", "fa-circle-info");
-                launchGame(`Werewolf_game.html?code=${code}`, 'Werewolf Game');
+                launchGame(`werewolf_game.html?code=${code}`, 'Werewolf Game');
                 return;
             }
 
@@ -815,7 +815,7 @@
                     return;
                 }
 
-                // ทำการเพิ่มผู้เล่นเข้าห้องใน Firebase อัตโนมัติ แล้วเปิด Iframe ไปยัง Werewolf_game.html พร้อมส่งรหัสห้อง
+                // ทำการเพิ่มผู้เล่นเข้าห้องใน Firebase อัตโนมัติ แล้วเปิด Iframe ไปยัง werewolf_game.html พร้อมส่งรหัสห้อง
                 const playerRef = firebase.database().ref(`games/werewolf/rooms/${code}/players/${hubUser.id}`);
                 playerRef.once('value').then((pSnap) => {
                     if (!pSnap.exists()) {
