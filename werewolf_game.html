@@ -85,7 +85,6 @@
         <!-- ================= 1. MAIN MENU SCREEN ================= -->
         <div id="screen-main-menu" class="w-full glass-panel rounded-3xl p-6 shadow-2xl space-y-6 text-center border border-indigo-500/20">
             <div class="py-2 space-y-3">
-                <!-- Enlarged Direct Transparent Illustration without Rectangular Box -->
                 <div class="w-48 h-48 mx-auto flex items-center justify-center drop-shadow-[0_20px_35px_rgba(244,63,94,0.4)]">
                     <img src="https://cdn.discordapp.com/attachments/910019505244241921/1546758982717280336/72f21ce8dbea385c.png?ex=6aa0f30e&is=6a9fa18e&hm=0bf90c38b34d9fa42355c77fcc2fcee7670dfc485946ffb5e4bfe68e82b781ed&" 
                          alt="Werewolf Mascot" 
@@ -828,16 +827,33 @@
             if (!roomData || roomData.hostId !== currentUserId) return;
 
             const nonGmPlayers = Object.values(roomData.players).filter(p => !p.isHost);
-            if (nonGmPlayers.length < 4) {
+            const playerCount = nonGmPlayers.length;
+
+            if (playerCount < 4) {
                 showToast("ต้องการผู้เล่นอย่างน้อย 4 คนในการเริ่มเกม", "fa-triangle-exclamation");
                 return;
             }
+            if (playerCount > 20) {
+                showToast("ห้องนี้มีผู้เล่นเกิน 20 คน รองรับสูงสุดได้ 20 คนครับ", "fa-triangle-exclamation");
+                return;
+            }
 
-            const initialDeck = roomData.settings.selectedDeck || ['Werewolf', 'Werewolf', 'Seer', 'Bodyguard', 'Villager', 'Villager'];
+            let initialDeck = roomData.settings.selectedDeck || ['Werewolf', 'Werewolf', 'Seer', 'Bodyguard', 'Villager', 'Villager'];
+
+            if (initialDeck.length > playerCount) {
+                showToast(`จำนวนบทบาท (${initialDeck.length} ใบ) เกินจำนวนผู้เล่น (${playerCount} คน) ระบบจะตัดบทบาทส่วนเกินออกให้อัตโนมัติ`, "fa-circle-info");
+                initialDeck = initialDeck.slice(0, playerCount);
+            } else if (initialDeck.length < playerCount) {
+                const diff = playerCount - initialDeck.length;
+                for (let i = 0; i < diff; i++) {
+                    initialDeck.push('Villager');
+                }
+            }
+
             const deck = shuffleArray(initialDeck);
 
             nonGmPlayers.forEach((p, idx) => {
-                p.role = deck[idx % deck.length] || 'Villager';
+                p.role = deck[idx] || 'Villager';
                 p.isAlive = true;
                 p.isMayor = false;
             });
