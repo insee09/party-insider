@@ -24,7 +24,7 @@
         }
 
         .glass-panel {
-            background: rgba(15, 20, 32, 0.85);
+            background: rgba(15, 20, 32, 0.88);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
             border: 1px solid rgba(255, 255, 255, 0.12);
@@ -59,7 +59,6 @@
 </head>
 <body class="flex flex-col items-center justify-center p-3 md:p-6 min-h-screen relative">
 
-    <!-- App Container -->
     <div class="w-full max-w-md my-auto flex flex-col items-center relative z-10">
 
         <!-- Top Game Header -->
@@ -79,31 +78,24 @@
             <!-- Floating Current User Badge -->
             <div class="bg-slate-900/80 border border-slate-700/80 rounded-full px-3 py-1 flex items-center gap-1.5 text-[11px]">
                 <i class="fa-solid fa-user-ninja text-indigo-400"></i>
-                <span id="top-user-name-display" class="font-bold text-slate-200">Player</span>
+                <span id="top-user-name-display" class="font-bold text-slate-200">ผู้เล่น</span>
             </div>
         </header>
 
-        <!-- -->
         <!-- ================= 1. MAIN MENU SCREEN ================= -->
         <div id="screen-main-menu" class="w-full glass-panel rounded-3xl p-6 shadow-2xl space-y-6 text-center border border-indigo-500/20">
-            <div class="py-4 space-y-2">
-                <div class="w-20 h-20 mx-auto bg-gradient-to-tr from-rose-900/60 to-purple-900/60 rounded-full flex items-center justify-center border border-rose-500/40 shadow-inner p-3">
-                    <svg class="w-full h-full text-rose-400 animate-pulse drop-shadow-[0_0_10px_rgba(244,63,94,0.6)]" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M50 10L36 32L12 20L26 48L8 62L32 76L50 92L68 76L92 62L74 48L88 20L64 32L50 10Z" fill="url(#wolfGradGame)" stroke="#f43f5e" stroke-width="2.5" stroke-linejoin="round"/>
-                        <polygon points="34,48 45,54 38,62" fill="#fbbf24"/>
-                        <polygon points="66,48 55,54 62,62" fill="#fbbf24"/>
-                        <polygon points="50,68 44,75 56,75" fill="#0f172a"/>
-                        <defs>
-                            <linearGradient id="wolfGradGame" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" stop-color="#fb7185"/>
-                                <stop offset="50%" stop-color="#e11d48"/>
-                                <stop offset="100%" stop-color="#881337"/>
-                            </linearGradient>
-                        </defs>
-                    </svg>
+            <div class="py-2 space-y-3">
+                <!-- Direct Transparent Illustration without Rectangular Box -->
+                <div class="w-32 h-32 mx-auto flex items-center justify-center drop-shadow-[0_15px_30px_rgba(244,63,94,0.3)]">
+                    <img src="https://cdn.discordapp.com/attachments/910019505244241921/1546758982717280336/72f21ce8dbea385c.png?ex=6aa0f30e&is=6a9fa18e&hm=0bf90c38b34d9fa42355c77fcc2fcee7670dfc485946ffb5e4bfe68e82b781ed&" 
+                         alt="Werewolf Mascot" 
+                         class="w-full h-full object-contain filter drop-shadow-[0_10px_20px_rgba(0,0,0,0.8)]"
+                         onerror="this.onerror=null; this.src='https://placehold.co/150x150/transparent/fda4af?text=🐺';">
                 </div>
-                <h2 class="text-2xl font-extrabold text-white">หมาป่าสลายหมู่บ้าน</h2>
-                <p class="text-xs text-slate-300 max-w-xs mx-auto">เกมจิตวิทยาและการบลัฟอันดับหนึ่ง เลือกโหมดที่ต้องการเพื่อเริ่มเล่นกับเพื่อน</p>
+                <div>
+                    <h2 class="text-2xl font-extrabold text-white">หมาป่าสลายหมู่บ้าน</h2>
+                    <p class="text-xs text-slate-300 max-w-xs mx-auto mt-1">เกมจิตวิทยาและการบลัฟอันดับหนึ่ง เลือกโหมดที่ต้องการเพื่อเริ่มเล่นกับเพื่อน</p>
+                </div>
             </div>
 
             <div class="space-y-3">
@@ -111,7 +103,7 @@
                     <div class="flex items-center gap-3">
                         <i class="fa-solid fa-mobile-screen-button text-2xl text-amber-300"></i>
                         <div class="text-left">
-                            <div class="text-sm font-bold">📱 เล่นเครื่องเดียว (Pass & Play)</div>
+                            <div class="text-sm font-bold">📱 เล่นเครื่องเดียว (ส่งต่อมือถือ)</div>
                             <div class="text-[11px] text-indigo-200/80 font-normal">วนส่งมือถือเปิดดูบทบาทในวงเพื่อน</div>
                         </div>
                     </div>
@@ -122,7 +114,7 @@
                     <div class="flex items-center gap-3">
                         <i class="fa-solid fa-globe text-2xl text-rose-400"></i>
                         <div class="text-left">
-                            <div class="text-sm font-bold">🌐 เล่นออนไลน์หลายเครื่อง (Multi-Device)</div>
+                            <div class="text-sm font-bold">🌐 เล่นออนไลน์หลายเครื่อง (สร้างห้อง)</div>
                             <div class="text-[11px] text-slate-400 font-normal">สร้างห้องด้วย Room Code 8 หลัก</div>
                         </div>
                     </div>
@@ -151,13 +143,9 @@
                         <span id="pp-player-count-display" class="font-bold text-amber-300 text-sm bg-slate-950 py-0.5 px-2.5 rounded-lg border border-slate-800">6 คน</span>
                     </div>
                     <div class="flex items-center gap-2">
-                        <button type="button" onclick="stepPPPlayerCount(-1)" class="w-8 h-8 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-base flex items-center justify-center border border-slate-700 active:scale-95 transition shadow flex-shrink-0">
-                            -
-                        </button>
+                        <button type="button" onclick="stepPPPlayerCount(-1)" class="w-8 h-8 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-base flex items-center justify-center border border-slate-700 active:scale-95 transition shadow flex-shrink-0">-</button>
                         <input type="range" id="pp-player-count-range" min="4" max="20" value="6" oninput="updatePPPlayerCount(this.value)" class="w-full accent-indigo-500 cursor-pointer h-2 bg-slate-950 rounded-lg touch-pan-x">
-                        <button type="button" onclick="stepPPPlayerCount(1)" class="w-8 h-8 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-base flex items-center justify-center shadow active:scale-95 transition flex-shrink-0">
-                            +
-                        </button>
+                        <button type="button" onclick="stepPPPlayerCount(1)" class="w-8 h-8 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-base flex items-center justify-center shadow active:scale-95 transition flex-shrink-0">+</button>
                     </div>
                 </div>
 
@@ -207,12 +195,8 @@
                         <div id="pp-card-inner" class="relative w-full h-full transform-style-3d shadow-2xl rounded-2xl">
                             <!-- FRONT -->
                             <div id="pp-card-front" class="absolute inset-0 backface-hidden bg-gradient-to-b from-indigo-950 via-slate-900 to-slate-950 border-2 border-indigo-500/60 rounded-2xl p-4 flex flex-col items-center justify-between">
-                                <span id="pp-card-faction" class="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/40">
-                                    ฝ่ายชาวบ้าน
-                                </span>
-                                <div id="pp-card-icon" class="w-20 h-20 rounded-2xl bg-indigo-600/20 border border-indigo-400/30 flex items-center justify-center text-4xl text-indigo-300 my-auto shadow-inner">
-                                    👁️
-                                </div>
+                                <span id="pp-card-faction" class="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/40">ฝ่ายชาวบ้าน</span>
+                                <div id="pp-card-icon" class="w-20 h-20 rounded-2xl bg-indigo-600/20 border border-indigo-400/30 flex items-center justify-center text-4xl text-indigo-300 my-auto shadow-inner">👁️</div>
                                 <div>
                                     <h4 id="pp-card-title" class="text-lg font-black text-amber-300">ผู้หยั่งรู้ (Seer)</h4>
                                     <span class="text-[9px] text-slate-400 font-medium block mt-0.5"><i class="fa-solid fa-rotate mr-1"></i> แตะเพื่อดูคำอธิบาย</span>
@@ -295,9 +279,7 @@
 
             <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-3 space-y-1">
                 <span class="text-[11px] font-bold text-indigo-300 block"><i class="fa-solid fa-layer-group mr-1"></i> สรุปชุดการ์ดปัจจุบันในห้อง:</span>
-                <div id="lobby-deck-summary-text" class="text-[11px] text-slate-300 leading-snug">
-                    [ 🐺 หมาป่า 2, 👁️ Seer 1, 🛡️ Guard 1, 👨‍🌾 ชาวบ้าน 2 ]
-                </div>
+                <div id="lobby-deck-summary-text" class="text-[11px] text-slate-300 leading-snug">[ 🐺 หมาป่า 2, 👁️ Seer 1, 🛡️ Guard 1, 👨‍🌾 ชาวบ้าน 2 ]</div>
             </div>
 
             <div>
@@ -330,7 +312,6 @@
 
         <!-- ================= 4. NIGHT PHASE SCREEN ================= -->
         <div id="screen-night-phase" class="hidden w-full glass-panel rounded-3xl p-6 shadow-2xl space-y-5 text-center">
-            <!-- Pass & Play Night Hand-off Privacy Cover -->
             <div id="pp-night-privacy" class="hidden py-8 space-y-4 bg-slate-950/90 border border-slate-800 rounded-2xl p-5">
                 <div class="w-16 h-16 mx-auto bg-purple-600/20 rounded-full flex items-center justify-center text-3xl text-purple-400 border border-purple-500/30">
                     <i class="fa-solid fa-user-ninja animate-pulse"></i>
@@ -342,7 +323,6 @@
                 </button>
             </div>
 
-            <!-- Active Night Action Box -->
             <div id="night-action-box" class="space-y-4">
                 <div class="bg-indigo-950/80 border border-indigo-500/40 rounded-2xl p-3">
                     <span class="text-[10px] text-indigo-300 tracking-widest uppercase block font-mono">NIGHT PHASE</span>
@@ -403,9 +383,7 @@
 
         <!-- ================= 7. DEAD PLAYER SCREEN ================= -->
         <div id="screen-dead-player" class="hidden w-full glass-panel rounded-3xl p-8 shadow-2xl space-y-6 text-center">
-            <div class="w-20 h-20 mx-auto bg-rose-950/80 border border-rose-500/40 rounded-full flex items-center justify-center text-4xl text-rose-400 shadow-inner">
-                💀
-            </div>
+            <div class="w-20 h-20 mx-auto bg-rose-950/80 border border-rose-500/40 rounded-full flex items-center justify-center text-4xl text-rose-400 shadow-inner">💀</div>
             <div class="space-y-2">
                 <h2 class="text-2xl font-black text-rose-400">คุณเสียชีวิตแล้ว</h2>
                 <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-3 inline-block">
@@ -421,9 +399,7 @@
         <!-- ================= 8. GAME OVER SCREEN ================= -->
         <div id="screen-game-over" class="hidden w-full glass-panel rounded-3xl p-6 shadow-2xl space-y-5 text-center">
             <div class="py-4 space-y-2">
-                <div class="w-20 h-20 mx-auto bg-amber-500/20 border border-amber-500/40 rounded-full flex items-center justify-center text-4xl text-amber-400 shadow-inner">
-                    🏆
-                </div>
+                <div class="w-20 h-20 mx-auto bg-amber-500/20 border border-amber-500/40 rounded-full flex items-center justify-center text-4xl text-amber-400 shadow-inner">🏆</div>
                 <h2 id="winner-team-title" class="text-2xl font-black text-amber-300">ฝ่ายชาวบ้านเป็นฝ่ายชนะ!</h2>
             </div>
 
@@ -452,12 +428,8 @@
                     <div id="modal-card-inner" class="relative w-full h-full transform-style-3d shadow-2xl rounded-2xl">
                         <!-- FRONT -->
                         <div class="absolute inset-0 backface-hidden bg-gradient-to-b from-indigo-950 via-slate-900 to-slate-950 border-2 border-indigo-500/60 rounded-2xl p-4 flex flex-col items-center justify-between">
-                            <span id="modal-card-faction" class="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/40">
-                                ฝ่ายชาวบ้าน
-                            </span>
-                            <div id="modal-card-icon" class="w-16 h-16 rounded-2xl bg-indigo-600/20 border border-indigo-400/30 flex items-center justify-center text-3xl text-indigo-300 my-auto shadow-inner">
-                                👁️
-                            </div>
+                            <span id="modal-card-faction" class="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/40">ฝ่ายชาวบ้าน</span>
+                            <div id="modal-card-icon" class="w-16 h-16 rounded-2xl bg-indigo-600/20 border border-indigo-400/30 flex items-center justify-center text-3xl text-indigo-300 my-auto shadow-inner">👁️</div>
                             <div>
                                 <h4 id="modal-card-title" class="text-base font-black text-amber-300">ผู้หยั่งรู้ (Seer)</h4>
                                 <span class="text-[9px] text-slate-400 font-medium block mt-0.5"><i class="fa-solid fa-rotate mr-1"></i> แตะเพื่อดูคำอธิบาย</span>
@@ -508,7 +480,6 @@
                     <span class="text-slate-200">แสดงชื่อคนโหวตประหาร (Public Voting)</span>
                 </label>
 
-                <!-- ROLE DECK QUANTITY CUSTOMIZER FOR GM -->
                 <div class="border border-slate-800 rounded-xl p-2.5 bg-slate-950/80 space-y-2">
                     <span class="text-indigo-300 font-bold block text-[11px]"><i class="fa-solid fa-layer-group mr-1"></i> จัดชุดจำนวนการ์ดบทบาทในห้อง:</span>
                     <div id="gm-role-steppers-grid" class="grid grid-cols-1 gap-1.5 max-h-48 overflow-y-auto pr-1"></div>
@@ -557,19 +528,6 @@
             return arr;
         }
 
-        function adjustDeckToPlayerCount(configuredDeck, targetCount) {
-            let deck = [...configuredDeck];
-            if (deck.length < targetCount) {
-                const neededVillagers = targetCount - deck.length;
-                for (let i = 0; i < neededVillagers; i++) {
-                    deck.push('Villager');
-                }
-            } else if (deck.length > targetCount) {
-                deck = deck.slice(0, targetCount);
-            }
-            return shuffleArray(deck);
-        }
-
         const WW_FIREBASE_CONFIG = {
             apiKey: "AIzaSyCh8osVcBOTpDdWqpWICJ6LYC0T_9McnbQ",
             authDomain: "insider-test-58d2a.firebaseapp.com",
@@ -596,34 +554,16 @@
         let ppPlayers = [];
         let ppCurrentPlayerIndex = 0;
 
-        // Role Counts objects for Pass & Play and Online GM
-        let ppRoleCounts = {
-            'Werewolf': 2,
-            'Seer': 1,
-            'Bodyguard': 1,
-            'Silencer': 1,
-            'Villager': 2
-        };
-
-        let gmRoleCounts = {
-            'Werewolf': 2,
-            'Seer': 1,
-            'Bodyguard': 1,
-            'Villager': 2
-        };
+        let ppRoleCounts = { 'Werewolf': 2, 'Seer': 1, 'Bodyguard': 1, 'Silencer': 1, 'Villager': 2 };
+        let gmRoleCounts = { 'Werewolf': 2, 'Seer': 1, 'Bodyguard': 1, 'Villager': 2 };
 
         function getDeckFromCounts(countsObj) {
             const deck = [];
             Object.keys(countsObj).forEach(roleKey => {
                 const count = countsObj[roleKey] || 0;
-                for (let i = 0; i < count; i++) {
-                    deck.push(roleKey);
-                }
+                for (let i = 0; i < count; i++) { deck.push(roleKey); }
             });
-            // Guarantee at least 1 Werewolf if somehow empty
-            if (!deck.includes('Werewolf')) {
-                deck.push('Werewolf');
-            }
+            if (!deck.includes('Werewolf')) { deck.push('Werewolf'); }
             return deck;
         }
 
@@ -680,13 +620,9 @@
                             ${isWerewolf ? '<span class="text-[9px] text-rose-400 font-bold bg-rose-950/80 px-1.5 py-0.2 rounded border border-rose-500/30">ขั้นต่ำ 1</span>' : ''}
                         </div>
                         <div class="flex items-center gap-1 flex-shrink-0">
-                            <button type="button" onclick="changeRoleCount('${mode}', '${roleKey}', -1)" ${decDisabled ? 'disabled' : ''} class="w-6 h-6 rounded-lg bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-slate-700 text-slate-200 font-bold flex items-center justify-center border border-slate-700 active:scale-95 transition">
-                                -
-                            </button>
+                            <button type="button" onclick="changeRoleCount('${mode}', '${roleKey}', -1)" ${decDisabled ? 'disabled' : ''} class="w-6 h-6 rounded-lg bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-slate-700 text-slate-200 font-bold flex items-center justify-center border border-slate-700 active:scale-95 transition">-</button>
                             <input type="number" min="${minVal}" max="20" value="${count}" onchange="handleRoleInput('${mode}', '${roleKey}', this.value)" class="w-9 h-6 text-center bg-slate-950 border border-slate-700 rounded-md font-bold text-amber-300 focus:outline-none focus:border-indigo-500 text-xs">
-                            <button type="button" onclick="changeRoleCount('${mode}', '${roleKey}', 1)" class="w-6 h-6 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-bold flex items-center justify-center shadow active:scale-95 transition">
-                                +
-                            </button>
+                            <button type="button" onclick="changeRoleCount('${mode}', '${roleKey}', 1)" class="w-6 h-6 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-bold flex items-center justify-center shadow active:scale-95 transition">+</button>
                         </div>
                     </div>
                 `;
@@ -834,6 +770,8 @@
                 }).catch(() => {
                     showToast("ไม่สามารถเชื่อมต่อระบบห้องได้", "fa-circle-xmark");
                 });
+            } else {
+                showToast("กรุณาเชื่อมต่ออินเทอร์เน็ตหรือใช้งาน Firebase", "fa-circle-xmark");
             }
         }
 
@@ -900,7 +838,6 @@
             const mayorIdx = Math.floor(Math.random() * nonGmPlayers.length);
             nonGmPlayers[mayorIdx].isMayor = true;
 
-            // Day 0: Buffer Phase
             roomData.status = 'day';
             roomData.gameplay = {
                 dayNumber: 0,
@@ -943,7 +880,6 @@
                 const nonGmPlayers = playersList.filter(p => !p.isHost);
                 document.getElementById('lobby-player-count').innerText = `${nonGmPlayers.length} คน`;
 
-                // Update Deck Summary
                 const deckSummary = data.settings?.selectedDeck ? data.settings.selectedDeck.join(', ') : 'Werewolf x2, Seer, Bodyguard, Villager x2';
                 document.getElementById('lobby-deck-summary-text').innerText = `[ ${deckSummary} ]`;
 
@@ -1100,10 +1036,10 @@
             }
 
             const ppDeck = getDeckFromCounts(ppRoleCounts);
-            const deck = adjustDeckToPlayerCount(ppDeck, ppPlayers.length);
+            const deck = shuffleArray(ppDeck);
 
             ppPlayers.forEach((p, idx) => {
-                p.role = deck[idx] || 'Villager';
+                p.role = deck[idx % deck.length] || 'Villager';
                 p.isMayor = (p.role === 'Mayor');
             });
 
@@ -1117,12 +1053,7 @@
                 code: 'PASSPLAY',
                 status: 'day',
                 hostId: 'pp_gm',
-                settings: {
-                    gmMode: 'automated',
-                    chatEnabled: false,
-                    publicVoting: true,
-                    selectedDeck: ppDeck
-                },
+                settings: { gmMode: 'automated', chatEnabled: false, publicVoting: true, selectedDeck: ppDeck },
                 gameplay: {
                     dayNumber: 0,
                     nightNumber: 0,
@@ -1138,17 +1069,8 @@
                 players: {}
             };
 
-            roomData.players['pp_gm'] = {
-                id: 'pp_gm',
-                name: 'Game Master 👑',
-                isHost: true,
-                role: 'GM',
-                isAlive: true
-            };
-
-            ppPlayers.forEach(p => {
-                roomData.players[p.id] = p;
-            });
+            roomData.players['pp_gm'] = { id: 'pp_gm', name: 'Game Master 👑', isHost: true, role: 'GM', isAlive: true };
+            ppPlayers.forEach(p => { roomData.players[p.id] = p; });
 
             ppCurrentPlayerIndex = 0;
             setupPPPlayerReveal(ppCurrentPlayerIndex);
@@ -1188,7 +1110,6 @@
                 setupPPPlayerReveal(ppCurrentPlayerIndex);
             } else {
                 currentUserId = 'pp_gm';
-                // Go to Day 0 first!
                 showScreen('screen-day-discussion');
                 setupDayDiscussionUI();
             }
@@ -1198,7 +1119,7 @@
             if (!roomData) return;
             roomData.status = 'night';
             roomData.gameplay.nightNumber = nightNum;
-            roomData.gameplay.currentNightTurn = 1; // Start Turn 1: Werewolves
+            roomData.gameplay.currentNightTurn = 1;
             roomData.gameplay.werewolfVotes = {};
             
             showScreen('screen-night-phase');
@@ -1230,7 +1151,7 @@
                 document.getElementById('night-action-box').classList.remove('hidden');
             }
 
-            if (turnNum === 1) { // Werewolf Turn
+            if (turnNum === 1) {
                 document.getElementById('night-turn-role-name').innerText = "ฝ่ายหมาป่า (Werewolves)";
                 document.getElementById('night-action-prompt').innerText = "📜 เลือกสังหารผู้เล่น (มติเสียงข้างมาก):";
                 
@@ -1240,12 +1161,10 @@
                             <input type="radio" name="night-target" value="${p.id}" onchange="selectedNightTargetId = this.value" class="accent-rose-500">
                             <span class="text-xs text-white font-bold">${p.name}</span>
                         </div>
-                        <span class="text-[10px] text-rose-400 font-bold bg-rose-950/60 px-2 py-0.5 rounded-full border border-rose-500/30">
-                            🐺 เป้าหมาย
-                        </span>
+                        <span class="text-[10px] text-rose-400 font-bold bg-rose-950/60 px-2 py-0.5 rounded-full border border-rose-500/30">🐺 เป้าหมาย</span>
                     </label>
                 `).join('');
-            } else if (turnNum === 2) { // Bodyguard
+            } else if (turnNum === 2) {
                 document.getElementById('night-turn-role-name').innerText = "🛡️ บอดี้การ์ด (Bodyguard)";
                 document.getElementById('night-action-prompt').innerText = "📜 เลือกผู้เล่นที่จะปกป้องในคืนนี้:";
                 targetList.innerHTML = alivePlayers.map(p => `
@@ -1256,7 +1175,7 @@
                         </div>
                     </label>
                 `).join('');
-            } else if (turnNum === 3) { // Seer
+            } else if (turnNum === 3) {
                 document.getElementById('night-turn-role-name').innerText = "👁️ ผู้หยั่งรู้ (Seer)";
                 document.getElementById('night-action-prompt').innerText = "📜 เลือกผู้เล่นที่จะส่องดูบทบาทจริง:";
                 targetList.innerHTML = alivePlayers.map(p => `
@@ -1267,7 +1186,7 @@
                         </div>
                     </label>
                 `).join('');
-            } else if (turnNum === 4) { // Silencer
+            } else if (turnNum === 4) {
                 document.getElementById('night-turn-role-name').innerText = "🔇 นักสาปแช่ง (Silencer)";
                 document.getElementById('night-action-prompt').innerText = "📜 เลือกผู้เล่นที่จะสั่งปิดปากในวันถัดไป:";
                 targetList.innerHTML = alivePlayers.map(p => `
@@ -1295,18 +1214,18 @@
             }
             if (roomData.gameplay.currentNightTurn === 1) {
                 roomData.gameplay.killedNightTargetId = selectedNightTargetId;
-                roomData.gameplay.currentNightTurn = 2; // Move to Bodyguard
+                roomData.gameplay.currentNightTurn = 2;
                 selectedNightTargetId = null;
                 setupNightTurnUI();
             } else if (roomData.gameplay.currentNightTurn === 2) {
                 roomData.gameplay.protectedPlayerId = selectedNightTargetId;
-                roomData.gameplay.currentNightTurn = 3; // Move to Seer
+                roomData.gameplay.currentNightTurn = 3;
                 selectedNightTargetId = null;
                 setupNightTurnUI();
             } else if (roomData.gameplay.currentNightTurn === 3) {
                 const targetPlayer = roomData.players[selectedNightTargetId];
                 showToast(`ผลส่อง: ${targetPlayer.name} คือบทบาท ${ALL_ROLES[targetPlayer.role]?.title || 'ชาวบ้าน'}`, "fa-eye");
-                roomData.gameplay.currentNightTurn = 4; // Move to Silencer
+                roomData.gameplay.currentNightTurn = 4;
                 selectedNightTargetId = null;
                 setupNightTurnUI();
             } else if (roomData.gameplay.currentNightTurn === 4) {
@@ -1466,7 +1385,7 @@
         function showToast(text, iconClass = "fa-circle-info") {
             const toast = document.getElementById('toast-ww');
             document.getElementById('toast-ww-text').innerText = text;
-            document.getElementById('toast-ww-icon').className = `fa-solid ${iconClass} text-indigo-400`;
+            document.getElementById('toast-ww-icon', `fa-solid ${iconClass} text-indigo-400`);
             toast.classList.remove('hidden');
             setTimeout(() => { toast.classList.add('hidden'); }, 3000);
         }
