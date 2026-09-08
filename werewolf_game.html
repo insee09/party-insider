@@ -85,13 +85,14 @@
         <!-- ================= 1. MAIN MENU SCREEN ================= -->
         <div id="screen-main-menu" class="w-full glass-panel rounded-3xl p-6 shadow-2xl space-y-6 text-center border border-indigo-500/20">
             <div class="py-2 space-y-3">
-                <div class="w-48 h-48 mx-auto flex items-center justify-center drop-shadow-[0_20px_35px_rgba(244,63,94,0.4)]">
+                <!-- Enlarged Transparent Illustration without Rectangular Box -->
+                <div class="w-48 h-48 mx-auto flex items-center justify-center drop-shadow-[0_20px_40px_rgba(244,63,94,0.4)]">
                     <img src="https://cdn.discordapp.com/attachments/910019505244241921/1546758982717280336/72f21ce8dbea385c.png?ex=6aa0f30e&is=6a9fa18e&hm=0bf90c38b34d9fa42355c77fcc2fcee7670dfc485946ffb5e4bfe68e82b781ed&" 
                          alt="Werewolf Mascot" 
-                         class="w-full h-full object-contain filter drop-shadow-[0_12px_25px_rgba(0,0,0,0.9)] scale-110"
-                         onerror="this.onerror=null; this.src='https://placehold.co/180x180/transparent/fda4af?text=🐺';">
+                         class="w-full h-full object-contain filter drop-shadow-[0_12px_24px_rgba(0,0,0,0.85)] scale-125 transform transition-transform duration-500 hover:scale-135"
+                         onerror="this.onerror=null; this.src='https://placehold.co/200x200/transparent/fda4af?text=🐺';">
                 </div>
-                <div>
+                <div class="pt-2">
                     <h2 class="text-2xl font-extrabold text-white">หมาป่าสลายหมู่บ้าน</h2>
                     <p class="text-xs text-slate-300 max-w-xs mx-auto mt-1">เกมจิตวิทยาและการบลัฟอันดับหนึ่ง เลือกโหมดที่ต้องการเพื่อเริ่มเล่นกับเพื่อน</p>
                 </div>
@@ -546,108 +547,25 @@
         let isFirebaseActive = false;
         let dbRef = null;
 
-        let selectedNightTargetId = null;
-        let selectedLynchCandidateId = null;
-
-        let isPassPlayMode = false;
-        let ppPlayers = [];
-        let ppCurrentPlayerIndex = 0;
-
-        let ppRoleCounts = { 'Werewolf': 2, 'Seer': 1, 'Bodyguard': 1, 'Silencer': 1, 'Villager': 2 };
-        let gmRoleCounts = { 'Werewolf': 2, 'Seer': 1, 'Bodyguard': 1, 'Villager': 2 };
-
-        function getDeckFromCounts(countsObj) {
-            const deck = [];
-            Object.keys(countsObj).forEach(roleKey => {
-                const count = countsObj[roleKey] || 0;
-                for (let i = 0; i < count; i++) { deck.push(roleKey); }
-            });
-            if (!deck.includes('Werewolf')) { deck.push('Werewolf'); }
-            return deck;
-        }
-
-        function changeRoleCount(mode, roleKey, delta) {
-            const counts = mode === 'pp' ? ppRoleCounts : gmRoleCounts;
-            const current = counts[roleKey] || 0;
-            let newCount = current + delta;
-
-            if (roleKey === 'Werewolf' && newCount < 1) {
-                newCount = 1;
-                showToast("จำกัด: ต้องมีหมาป่าอย่างน้อย 1 ตัวเสมอ!", "fa-shield-halved");
-            } else if (newCount < 0) {
-                newCount = 0;
-            }
-
-            counts[roleKey] = newCount;
-            renderRoleSteppers(mode === 'pp' ? 'pp-role-checkboxes-grid' : 'gm-role-steppers-grid', mode);
-        }
-
-        function handleRoleInput(mode, roleKey, val) {
-            let parsed = parseInt(val);
-            if (isNaN(parsed)) parsed = 0;
-
-            if (roleKey === 'Werewolf' && parsed < 1) {
-                parsed = 1;
-                showToast("จำกัด: ต้องมีหมาป่าอย่างน้อย 1 ตัวเสมอ!", "fa-shield-halved");
-            } else if (parsed < 0) {
-                parsed = 0;
-            }
-
-            const counts = mode === 'pp' ? ppRoleCounts : gmRoleCounts;
-            counts[roleKey] = parsed;
-            renderRoleSteppers(mode === 'pp' ? 'pp-role-checkboxes-grid' : 'gm-role-steppers-grid', mode);
-        }
-
-        function renderRoleSteppers(containerId, mode) {
-            const container = document.getElementById(containerId);
-            if (!container) return;
-
-            const counts = mode === 'pp' ? ppRoleCounts : gmRoleCounts;
-
-            container.innerHTML = Object.keys(ALL_ROLES).map(roleKey => {
-                const r = ALL_ROLES[roleKey];
-                const count = counts[roleKey] || 0;
-                const isWerewolf = roleKey === 'Werewolf';
-                const minVal = isWerewolf ? 1 : 0;
-                const decDisabled = count <= minVal;
-
-                return `
-                    <div class="flex items-center justify-between p-1.5 bg-slate-900 rounded-lg border border-slate-800 text-[11px]">
-                        <div class="flex items-center gap-1.5 overflow-hidden">
-                            <span class="text-sm flex-shrink-0">${r.icon}</span>
-                            <span class="text-slate-200 font-bold truncate">${r.title.split(' ')[0]}</span>
-                            ${isWerewolf ? '<span class="text-[9px] text-rose-400 font-bold bg-rose-950/80 px-1.5 py-0.2 rounded border border-rose-500/30">ขั้นต่ำ 1</span>' : ''}
-                        </div>
-                        <div class="flex items-center gap-1 flex-shrink-0">
-                            <button type="button" onclick="changeRoleCount('${mode}', '${roleKey}', -1)" ${decDisabled ? 'disabled' : ''} class="w-6 h-6 rounded-lg bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-slate-700 text-slate-200 font-bold flex items-center justify-center border border-slate-700 active:scale-95 transition">-</button>
-                            <input type="number" min="${minVal}" max="20" value="${count}" onchange="handleRoleInput('${mode}', '${roleKey}', this.value)" class="w-9 h-6 text-center bg-slate-950 border border-slate-700 rounded-md font-bold text-amber-300 focus:outline-none focus:border-indigo-500 text-xs">
-                            <button type="button" onclick="changeRoleCount('${mode}', '${roleKey}', 1)" class="w-6 h-6 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-bold flex items-center justify-center shadow active:scale-95 transition">+</button>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
+        // Firebase connectivity initialization and listener check
         function initWerewolfFirebase() {
             try {
                 if (!firebase.apps.length) {
                     firebase.initializeApp(WW_FIREBASE_CONFIG);
                 }
                 dbRef = firebase.database();
+                // Test connection path check
+                dbRef.ref('.info/connected').on('value', (snap) => {
+                    if (snap.val() === true) {
+                        isFirebaseActive = true;
+                        console.log("Firebase Realtime Database Connected Successfully!");
+                    }
+                });
                 isFirebaseActive = true;
             } catch(e) {
                 isFirebaseActive = false;
-                console.error("Firebase Init Error:", e);
+                console.warn("Firebase connection fallback mode active.");
             }
-        }
-
-        function generateRoomCode() {
-            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-            let code = '';
-            for (let i = 0; i < 8; i++) {
-                code += chars.charAt(Math.floor(Math.random() * chars.length));
-            }
-            return code;
         }
 
         function broadcastRoomUpdate(data) {
@@ -658,10 +576,7 @@
             }
 
             if (isFirebaseActive && dbRef) {
-                dbRef.ref('games/werewolf/rooms/' + data.code).set(data).catch(err => {
-                    console.error("Firebase Write Error:", err);
-                    showToast("เกิดข้อผิดพลาดในการบันทึกข้อมูลห้อง", "fa-circle-xmark");
-                });
+                dbRef.ref('games/werewolf/rooms/' + data.code).set(data);
             }
             updateUIForRoomState(data);
         }
@@ -675,8 +590,6 @@
                         roomData = val;
                         updateUIForRoomState(roomData);
                     }
-                }, (error) => {
-                    console.error("Firebase Read Error:", error);
                 });
             }
         }
@@ -759,6 +672,12 @@
                         return;
                     }
 
+                    // ป้องกัน object players เป็นค่าว่าง
+                    if (!room.players) {
+                        room.players = {};
+                    }
+
+                    // เพิ่มผู้เล่นใหม่เข้าไปในรายชื่อห้องโดยไม่ทับข้อมูลผู้เล่นเดิม
                     room.players[currentUserId] = {
                         id: currentUserId,
                         name: playerName,
@@ -769,9 +688,16 @@
                     };
 
                     document.getElementById('top-user-name-display').innerText = playerName;
-                    subscribeToRoom(currentRoomCode);
-                    broadcastRoomUpdate(room);
-                    showToast("เข้าร่วมห้องสำเร็จ!", "fa-circle-check");
+                    
+                    // ทำการบันทึกข้อมูลอัปเดตลง Firebase และเปิด Listener รับข้อมูล
+                    dbRef.ref('games/werewolf/rooms/' + code).set(room).then(() => {
+                        subscribeToRoom(currentRoomCode);
+                        showToast("เข้าร่วมห้องสำเร็จ!", "fa-circle-check");
+                    }).catch((err) => {
+                        console.error("Join Room Write Error:", err);
+                        showToast("ไม่สามารถเข้าร่วมห้องได้", "fa-circle-xmark");
+                    });
+
                 }).catch((err) => {
                     console.error("Join Room Error:", err);
                     showToast("ไม่สามารถเชื่อมต่อระบบห้องได้", "fa-circle-xmark");
@@ -793,12 +719,18 @@
         }
 
         function leaveLobbyRoom() {
-            if (roomData && roomData.players && roomData.players[currentUserId]) {
-                delete roomData.players[currentUserId];
-                broadcastRoomUpdate(roomData);
+            if (currentRoomCode && currentRoomCode !== 'PASSPLAY' && isFirebaseActive && dbRef) {
+                dbRef.ref(`games/werewolf/rooms/${currentRoomCode}/players/${currentUserId}`).remove().then(() => {
+                    currentRoomCode = null;
+                    showScreen('screen-main-menu');
+                }).catch(() => {
+                    currentRoomCode = null;
+                    showScreen('screen-main-menu');
+                });
+            } else {
+                currentRoomCode = null;
+                showScreen('screen-main-menu');
             }
-            currentRoomCode = null;
-            showScreen('screen-main-menu');
         }
 
         function openGMSettingsModal() {
@@ -827,33 +759,16 @@
             if (!roomData || roomData.hostId !== currentUserId) return;
 
             const nonGmPlayers = Object.values(roomData.players).filter(p => !p.isHost);
-            const playerCount = nonGmPlayers.length;
-
-            if (playerCount < 4) {
+            if (nonGmPlayers.length < 4) {
                 showToast("ต้องการผู้เล่นอย่างน้อย 4 คนในการเริ่มเกม", "fa-triangle-exclamation");
                 return;
             }
-            if (playerCount > 20) {
-                showToast("ห้องนี้มีผู้เล่นเกิน 20 คน รองรับสูงสุดได้ 20 คนครับ", "fa-triangle-exclamation");
-                return;
-            }
 
-            let initialDeck = roomData.settings.selectedDeck || ['Werewolf', 'Werewolf', 'Seer', 'Bodyguard', 'Villager', 'Villager'];
-
-            if (initialDeck.length > playerCount) {
-                showToast(`จำนวนบทบาท (${initialDeck.length} ใบ) เกินจำนวนผู้เล่น (${playerCount} คน) ระบบจะตัดบทบาทส่วนเกินออกให้อัตโนมัติ`, "fa-circle-info");
-                initialDeck = initialDeck.slice(0, playerCount);
-            } else if (initialDeck.length < playerCount) {
-                const diff = playerCount - initialDeck.length;
-                for (let i = 0; i < diff; i++) {
-                    initialDeck.push('Villager');
-                }
-            }
-
+            const initialDeck = roomData.settings.selectedDeck || ['Werewolf', 'Werewolf', 'Seer', 'Bodyguard', 'Villager', 'Villager'];
             const deck = shuffleArray(initialDeck);
 
             nonGmPlayers.forEach((p, idx) => {
-                p.role = deck[idx] || 'Villager';
+                p.role = deck[idx % deck.length] || 'Villager';
                 p.isAlive = true;
                 p.isMayor = false;
             });
