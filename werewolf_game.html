@@ -546,6 +546,92 @@
         let roomData = null;
         let isFirebaseActive = false;
         let dbRef = null;
+        let isPassPlayMode = false;
+        let ppPlayers = [];
+        let ppCurrentPlayerIndex = 0;
+        let selectedNightTargetId = null;
+        let selectedLynchCandidateId = null;
+
+        // ตัวแปรเก็บจำนวนการ์ดบทบาทใน GM / Pass & Play Settings
+        let gmRoleCounts = {
+            'Werewolf': 2,
+            'Seer': 1,
+            'Bodyguard': 1,
+            'Villager': 2,
+            'WolfCub': 0,
+            'AlphaWolf': 0,
+            'Hunter': 0,
+            'Prince': 0,
+            'Silencer': 0,
+            'Mayor': 0,
+            'Fool': 0,
+            'Doppelganger': 0
+        };
+
+        let ppRoleCounts = {
+            'Werewolf': 2,
+            'Seer': 1,
+            'Bodyguard': 1,
+            'Villager': 2,
+            'WolfCub': 0,
+            'AlphaWolf': 0,
+            'Hunter': 0,
+            'Prince': 0,
+            'Silencer': 0,
+            'Mayor': 0,
+            'Fool': 0,
+            'Doppelganger': 0
+        };
+
+        function generateRoomCode() {
+            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+            let code = '';
+            for (let i = 0; i < 8; i++) {
+                code += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return code;
+        }
+
+        function renderRoleSteppers(containerId, mode) {
+            const counts = mode === 'gm' ? gmRoleCounts : ppRoleCounts;
+            const container = document.getElementById(containerId);
+            if (!container) return;
+
+            container.innerHTML = Object.keys(counts).map(roleKey => {
+                const r = ALL_ROLES[roleKey];
+                return `
+                    <div class="flex items-center justify-between p-2 bg-slate-900 rounded-xl border border-slate-800">
+                        <span class="font-bold text-slate-200">${r.icon} ${r.title}</span>
+                        <div class="flex items-center gap-2">
+                            <button type="button" onclick="adjustRoleCount('${mode}', '${roleKey}', -1)" class="w-6 h-6 rounded-lg bg-slate-800 text-slate-300 font-bold flex items-center justify-center hover:bg-slate-700">-</button>
+                            <span id="${mode}-count-${roleKey}" class="w-6 text-center font-bold text-amber-300">${counts[roleKey]}</span>
+                            <button type="button" onclick="adjustRoleCount('${mode}', '${roleKey}', 1)" class="w-6 h-6 rounded-lg bg-indigo-600 text-white font-bold flex items-center justify-center hover:bg-indigo-500">+</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function adjustRoleCount(mode, roleKey, delta) {
+            const counts = mode === 'gm' ? gmRoleCounts : ppRoleCounts;
+            counts[roleKey] = Math.max(0, counts[roleKey] + delta);
+            const span = document.getElementById(`${mode}-count-${roleKey}`);
+            if (span) span.innerText = counts[roleKey];
+        }
+
+        function getDeckFromCounts(counts) {
+            let deck = [];
+            Object.keys(counts).forEach(roleKey => {
+                const qty = counts[roleKey];
+                for (let i = 0; i < qty; i++) {
+                    deck.push(roleKey);
+                }
+            });
+            if (deck.length === 0) {
+                deck = ['Werewolf', 'Werewolf', 'Seer', 'Bodyguard', 'Villager', 'Villager'];
+            }
+            return deck;
+        }
 
         // Firebase connectivity initialization and listener check
         function initWerewolfFirebase() {
@@ -554,7 +640,6 @@
                     firebase.initializeApp(WW_FIREBASE_CONFIG);
                 }
                 dbRef = firebase.database();
-                // Test connection path check
                 dbRef.ref('.info/connected').on('value', (snap) => {
                     if (snap.val() === true) {
                         isFirebaseActive = true;
@@ -576,7 +661,9 @@
             }
 
             if (isFirebaseActive && dbRef) {
-                dbRef.ref('games/werewolf/rooms/' + data.code).set(data);
+                dbRef.ref('games/werewolf/rooms/' + data.code).set(data).catch((err) => {
+                    console.error("Broadcast Room Error:", err);
+                });
             }
             updateUIForRoomState(data);
         }
@@ -625,22 +712,36 @@
                     silencedPlayerId: null,
                     dayAnnouncements: []
                 },
-                players: {}
-            };
-
-            initialRoom.players[currentUserId] = {
-                id: currentUserId,
-                name: hostName,
-                isHost: true,
-                role: 'GM',
-                isAlive: true,
-                isMayor: false
+                players: {
+                    [currentUserId]: {
+                        id: currentUserId,
+                        name: hostName,
+                        isHost: true,
+                        role: 'GM',
+                        isAlive: true,
+                        isMayor: false
+                    }
+                }
             };
 
             document.getElementById('top-user-name-display').innerText = `${hostName} (GM)`;
-            subscribeToRoom(currentRoomCode);
-            broadcastRoomUpdate(initialRoom);
-            showToast(`สร้างห้องออนไลน์สำเร็จ! รหัสห้อง: ${currentRoomCode}`, "fa-crown");
+            
+            if (isFirebaseActive && dbRef) {
+                dbRef.ref('games/werewolf/rooms/' + currentRoomCode).set(initialRoom).then(() => {
+                    subscribeToRoom(currentRoomCode);
+                    showToast(`สร้างห้องออนไลน์สำเร็จ! รหัสห้อง: ${currentRoomCode}`, "fa-crown");
+                }).catch((err) => {
+                    console.error("Create Room Error:", err);
+                    // Fallback to local offline mode if Firebase rules or network block write
+                    roomData = initialRoom;
+                    updateUIForRoomState(roomData);
+                    showToast(`สร้างห้อง (โหมดออฟไลน์) สำเร็จ! รหัส: ${currentRoomCode}`, "fa-crown");
+                });
+            } else {
+                roomData = initialRoom;
+                updateUIForRoomState(roomData);
+                showToast(`สร้างห้องออฟไลน์สำเร็จ! รหัสห้อง: ${currentRoomCode}`, "fa-crown");
+            }
         }
 
         function joinExistingRoom() {
@@ -661,7 +762,8 @@
             isPassPlayMode = false;
 
             if (isFirebaseActive && dbRef) {
-                dbRef.ref('games/werewolf/rooms/' + code).once('value').then((snapshot) => {
+                const roomRef = dbRef.ref('games/werewolf/rooms/' + code);
+                roomRef.once('value').then((snapshot) => {
                     const room = snapshot.val();
                     if (!room) {
                         showToast("ไม่พบรหัสห้องนี้ในระบบ", "fa-circle-xmark");
@@ -672,12 +774,10 @@
                         return;
                     }
 
-                    // ป้องกัน object players เป็นค่าว่าง
                     if (!room.players) {
                         room.players = {};
                     }
 
-                    // เพิ่มผู้เล่นใหม่เข้าไปในรายชื่อห้องโดยไม่ทับข้อมูลผู้เล่นเดิม
                     room.players[currentUserId] = {
                         id: currentUserId,
                         name: playerName,
@@ -689,8 +789,7 @@
 
                     document.getElementById('top-user-name-display').innerText = playerName;
                     
-                    // ทำการบันทึกข้อมูลอัปเดตลง Firebase และเปิด Listener รับข้อมูล
-                    dbRef.ref('games/werewolf/rooms/' + code).set(room).then(() => {
+                    roomRef.set(room).then(() => {
                         subscribeToRoom(currentRoomCode);
                         showToast("เข้าร่วมห้องสำเร็จ!", "fa-circle-check");
                     }).catch((err) => {
@@ -958,7 +1057,8 @@
         }
 
         function startPassPlayGame() {
-            const count = parseInt(document.getElementById('pp-player-count-range').value);
+            const countInput = document.getElementById('pp-player-count-range');
+            const count = countInput ? parseInt(countInput.value) : 6;
             ppPlayers = [];
 
             for (let i = 1; i <= count; i++) {
