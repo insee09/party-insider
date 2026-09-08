@@ -85,12 +85,12 @@
         <!-- ================= 1. MAIN MENU SCREEN ================= -->
         <div id="screen-main-menu" class="w-full glass-panel rounded-3xl p-6 shadow-2xl space-y-6 text-center border border-indigo-500/20">
             <div class="py-2 space-y-3">
-                <!-- Direct Transparent Illustration without Rectangular Box -->
-                <div class="w-32 h-32 mx-auto flex items-center justify-center drop-shadow-[0_15px_30px_rgba(244,63,94,0.3)]">
+                <!-- Enlarged Direct Transparent Illustration without Rectangular Box -->
+                <div class="w-48 h-48 mx-auto flex items-center justify-center drop-shadow-[0_20px_35px_rgba(244,63,94,0.4)]">
                     <img src="https://cdn.discordapp.com/attachments/910019505244241921/1546758982717280336/72f21ce8dbea385c.png?ex=6aa0f30e&is=6a9fa18e&hm=0bf90c38b34d9fa42355c77fcc2fcee7670dfc485946ffb5e4bfe68e82b781ed&" 
                          alt="Werewolf Mascot" 
-                         class="w-full h-full object-contain filter drop-shadow-[0_10px_20px_rgba(0,0,0,0.8)]"
-                         onerror="this.onerror=null; this.src='https://placehold.co/150x150/transparent/fda4af?text=🐺';">
+                         class="w-full h-full object-contain filter drop-shadow-[0_12px_25px_rgba(0,0,0,0.9)] scale-110"
+                         onerror="this.onerror=null; this.src='https://placehold.co/180x180/transparent/fda4af?text=🐺';">
                 </div>
                 <div>
                     <h2 class="text-2xl font-extrabold text-white">หมาป่าสลายหมู่บ้าน</h2>
@@ -638,6 +638,7 @@
                 isFirebaseActive = true;
             } catch(e) {
                 isFirebaseActive = false;
+                console.error("Firebase Init Error:", e);
             }
         }
 
@@ -658,7 +659,10 @@
             }
 
             if (isFirebaseActive && dbRef) {
-                dbRef.ref('games/werewolf/rooms/' + data.code).set(data);
+                dbRef.ref('games/werewolf/rooms/' + data.code).set(data).catch(err => {
+                    console.error("Firebase Write Error:", err);
+                    showToast("เกิดข้อผิดพลาดในการบันทึกข้อมูลห้อง", "fa-circle-xmark");
+                });
             }
             updateUIForRoomState(data);
         }
@@ -672,6 +676,8 @@
                         roomData = val;
                         updateUIForRoomState(roomData);
                     }
+                }, (error) => {
+                    console.error("Firebase Read Error:", error);
                 });
             }
         }
@@ -767,7 +773,8 @@
                     subscribeToRoom(currentRoomCode);
                     broadcastRoomUpdate(room);
                     showToast("เข้าร่วมห้องสำเร็จ!", "fa-circle-check");
-                }).catch(() => {
+                }).catch((err) => {
+                    console.error("Join Room Error:", err);
                     showToast("ไม่สามารถเชื่อมต่อระบบห้องได้", "fa-circle-xmark");
                 });
             } else {
@@ -1385,7 +1392,7 @@
         function showToast(text, iconClass = "fa-circle-info") {
             const toast = document.getElementById('toast-ww');
             document.getElementById('toast-ww-text').innerText = text;
-            document.getElementById('toast-ww-icon', `fa-solid ${iconClass} text-indigo-400`);
+            document.getElementById('toast-ww-icon').className = `fa-solid ${iconClass} text-indigo-400`;
             toast.classList.remove('hidden');
             setTimeout(() => { toast.classList.add('hidden'); }, 3000);
         }
