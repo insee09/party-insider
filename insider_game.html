@@ -14,6 +14,9 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     
+    <!-- ================================================================= -->
+    <!-- [ส่วนที่ 1: สไตล์ตกแต่ง CSS, อนิเมชัน 3 มิติ และเอฟเฟกต์การ์ด] -->
+    <!-- ================================================================= -->
     <style>
         body {
             font-family: 'Kanit', sans-serif;
@@ -249,7 +252,10 @@
                 </div>
 
                 <!-- 2. ONLINE CHOICE SCREEN -->
-                <div id="screen-online-choice" class="hidden space-y-5">
+                <!-- ================================================================= -->
+        <!-- [ส่วนที่ 6: โหมด ONLINE - สร้างห้อง / เข้าร่วมห้อง / LOBBY]        -->
+        <!-- ================================================================= -->
+        <div id="screen-online-choice" class="hidden space-y-5">
                     <button onclick="showScreen('screen-main-menu')" class="text-xs text-slate-400 hover:text-white transition flex items-center gap-1">
                         <i class="fa-solid fa-arrow-left"></i> ย้อนกลับหน้าหลัก
                     </button>
@@ -473,7 +479,10 @@
                 </div>
 
                 <!-- 8. PASS & PLAY SETUP SCREEN -->
-                <div id="screen-passplay-setup" class="hidden space-y-4">
+                <!-- ================================================================= -->
+        <!-- [ส่วนที่ 3: โหมด PASS & PLAY - หน้าตั้งค่า (SETUP)]               -->
+        <!-- ================================================================= -->
+        <div id="screen-passplay-setup" class="hidden space-y-4">
                     <button onclick="showScreen('screen-main-menu')" class="text-xs text-slate-400 hover:text-white transition flex items-center gap-1">
                         <i class="fa-solid fa-arrow-left"></i> ย้อนกลับหน้าหลัก
                     </button>
@@ -505,7 +514,10 @@
                 </div>
 
                 <!-- PASS & PLAY GM & ROLE SCREENS -->
-                <div id="screen-passplay-gm" class="hidden space-y-4 text-center">
+                <!-- ================================================================= -->
+        <!-- [ส่วนที่ 4: โหมด PASS & PLAY - สำหรับ GM และวนส่งมือถือดูบทบาท]   -->
+        <!-- ================================================================= -->
+        <div id="screen-passplay-gm" class="hidden space-y-4 text-center">
                     <div class="bg-slate-800 border border-amber-500/40 rounded-xl p-4">
                         <i class="fa-solid fa-crown text-3xl text-amber-400 mb-2"></i>
                         <h3 class="text-lg font-bold text-amber-300">คุณคือ Game Master</h3>
@@ -652,7 +664,13 @@
         </div>
     </div>
 
+    <!-- ================================================================= -->
+    <!-- [ส่วนที่ 8: ระบบสคริปต์ควบคุม JavaScript หลัก (INSIDER CORE LOGIC)] -->
+    <!-- ================================================================= -->
     <script>
+        // =================================================================
+        // [ส่วนที่ 9: คลังคำศัพท์และตัวแปรเริ่มต้น (WORD BANK & VARIABLES)]
+        // =================================================================
         // Fallback default word bank if network fails
         const fallbackWordBank = [
             "ตู้เย็น", "ไมโครเวฟ", "พัดลม", "เครื่องซักผ้า", "เครื่องปรับอากาศ",
@@ -728,6 +746,9 @@
             appId: "1:277014409655:web:16f4727b7b5e5089e9b832"
         };
 
+        // =================================================================
+        // [ส่วนที่ 10: ระบบเชื่อมต่อฐานข้อมูล FIREBASE & REALTIME SYNC]
+        // =================================================================
         // Initialize Firebase
         function initFirebase() {
             try {
@@ -803,6 +824,9 @@
             setTimeout(() => { toast.classList.add('hidden'); }, 3000);
         }
 
+        // =================================================================
+        // [ส่วนที่ 11: ระบบสลับหน้าจอ และแอนิเมชันมาสคอต (UI ROUTER & ANIMATIONS)]
+        // =================================================================
         function showScreen(screenId) {
             const screens = [
                 'screen-main-menu', 'screen-online-choice', 'screen-online-lobby',
@@ -857,6 +881,9 @@
             return code;
         }
 
+        // =================================================================
+        // [ส่วนที่ 12: เครื่องยนต์เกมโหมด ONLINE (ONLINE MULTIPLAYER ENGINE)]
+        // =================================================================
         function createNewRoom() {
             const hostName = document.getElementById('host-name-input').value.trim();
             if (!hostName) {
@@ -1416,6 +1443,9 @@
         let offTimerSec = 240;
         let offTimerInterval = null;
 
+        // =================================================================
+        // [ส่วนที่ 13: เครื่องยนต์เกมโหมด PASS & PLAY (PASS PLAY ENGINE & STATS COUNTER)]
+        // =================================================================
         function updatePassPlaySetupUI() {
             offPlayerCount = parseInt(document.getElementById('off-player-range').value);
             offGameMinutes = parseInt(document.getElementById('off-time-range').value);
@@ -1424,6 +1454,14 @@
         }
 
         function startPassPlayGame() {
+            // [นับสถิติการเล่นโหมด Pass & Play (ออฟไลน์) ไปยัง Firebase]
+            if (isFirebaseActive && dbRef) {
+                try {
+                    dbRef.ref('stats/insider/offlineGamesCount').transaction(curr => (curr || 0) + 1);
+                } catch (e) {
+                    console.warn("Could not increment insider offlineGamesCount:", e);
+                }
+            }
             offCurrentWord = activeWordBank[Math.floor(Math.random() * activeWordBank.length)] || "ตู้เย็น";
             offRoles = ['Insider'];
             for (let i = 1; i < offPlayerCount; i++) {

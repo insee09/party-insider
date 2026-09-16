@@ -1,0 +1,52 @@
+{
+  "rules": {
+    "users": {
+      ".read": true,
+      "$uid": {
+        ".write": "auth != null && auth.uid === $uid"
+      }
+    },
+    "games": {
+      ".read": true,
+      "werewolf": {
+        "rooms": {
+          ".read": true,
+          ".write": true
+        },
+        "stats": {
+          ".read": true,
+          ".write": true
+        }
+      },
+      "insider": {
+        "rooms": {
+          ".read": true,
+          ".write": true
+        },
+        "stats": {
+          ".read": true,
+          ".write": true
+        }
+      }
+    },
+    "stats": {
+      ".read": true,
+      "werewolf": {
+        ".read": true,
+        ".write": true
+      },
+      "insider": {
+        ".read": true,
+        ".write": true
+      }
+    },
+    "wordBank": {
+      ".read": true,
+      ".write": false
+    },
+    "rooms": {
+      ".read": true,
+      ".write": true
+    }
+  }
+}
