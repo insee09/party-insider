@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Werewolf: Nightfall - เกมหมาป่าสลายหมู่บ้าน</title>
+    <title>Werewolf: Nightfall v1.5 - เกมหมาป่าสลายหมู่บ้าน</title>
     <!-- Tailwind CSS (CDN) -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Font Awesome Icons -->
@@ -74,7 +74,7 @@
                 </div>
                 <div class="text-left">
                     <h1 class="text-base font-black tracking-wide bg-gradient-to-r from-rose-400 via-amber-300 to-indigo-300 bg-clip-text text-transparent leading-none">
-                        WEREWOLF
+                        WEREWOLF v1.5
                     </h1>
                     <span class="text-[9px] text-slate-400 font-mono tracking-widest block leading-none mt-0.5">NIGHTFALL PARTY</span>
                 </div>
@@ -99,7 +99,7 @@
                          onerror="this.onerror=null; this.src='https://placehold.co/200x200/transparent/fda4af?text=🐺';">
                 </div>
                 <div class="pt-1">
-                    <h2 class="text-2xl font-extrabold text-white">หมาป่าสลายหมู่บ้าน</h2>
+                    <h2 class="text-2xl font-extrabold text-white">หมาป่าสลายหมู่บ้าน v1.5</h2>
                     <p class="text-xs text-slate-300 max-w-xs mx-auto mt-1">สมุดจดอัจฉริยะสำหรับ GM & ระบบปาร์ตี้บอร์ดเกม</p>
                 </div>
             </div>
@@ -161,13 +161,19 @@
                     </div>
                 </div>
 
+                <!-- แสดงรวมจำนวนการ์ดบทบาทที่เลือก -->
+                <div class="flex justify-between items-center bg-slate-950 p-2.5 rounded-xl border border-slate-800 text-xs">
+                    <span class="text-slate-300 font-bold"><i class="fa-solid fa-layer-group text-indigo-400 mr-1.5"></i> รวมการ์ดบทบาทที่เลือก:</span>
+                    <span id="pp-deck-count-summary" class="font-bold text-emerald-400 bg-slate-900 py-0.5 px-2.5 rounded-lg border border-emerald-500/40">6 / 6 ใบ</span>
+                </div>
+
                 <!-- Dropdown จัดสัดส่วนการ์ดบทบาท (Deck Customizer) -->
                 <div class="border border-slate-800 rounded-xl overflow-hidden">
                     <button onclick="PassPlayEngine.toggleDeckDropdown()" class="w-full p-2.5 bg-slate-950 flex justify-between items-center text-indigo-300 font-bold">
-                        <span><i class="fa-solid fa-layer-group mr-1.5"></i> เลือกจัดชุดจำนวนการ์ดบทบาท</span>
+                        <span><i class="fa-solid fa-sliders mr-1.5"></i> ปรับสัดส่วนจำนวนการ์ดบทบาท</span>
                         <i id="pp-deck-dropdown-arrow" class="fa-solid fa-chevron-down text-xs transition-transform"></i>
                     </button>
-                    <div id="pp-deck-customizer-content" class="hidden p-3 bg-slate-950/90 space-y-2 border-t border-slate-800 max-h-52 overflow-y-auto">
+                    <div id="pp-deck-customizer-content" class="hidden p-3 bg-slate-950/90 space-y-2 border-t border-slate-800 max-h-56 overflow-y-auto">
                         <div id="pp-role-checkboxes-grid" class="grid grid-cols-1 gap-1.5 text-[11px]"></div>
                     </div>
                 </div>
@@ -179,7 +185,7 @@
                 </div>
             </div>
 
-            <!-- ปุ่มเริ่มเกม (จะส่งสถิติไป Firebase ตามข้อตกลง) -->
+            <!-- ปุ่มเริ่มเกม -->
             <button onclick="PassPlayEngine.startGame()" class="w-full py-3.5 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-500 hover:to-pink-500 text-white font-bold text-sm rounded-xl shadow-lg active:scale-95 transition flex items-center justify-center gap-2">
                 <i class="fa-solid fa-play"></i> เริ่มเล่นเกม & วนดูบทบาท
             </button>
@@ -288,7 +294,7 @@
                 <!-- รายการสเต็ปคิวของบทบาทต่างๆ ในคืนนี้ -->
                 <div id="pp-night-action-steps" class="space-y-3 text-xs"></div>
 
-                <!-- กล่องเฉลยผลการส่องของ Seer (แสดงให้ GM เห็นทันที) -->
+                <!-- กล่องเฉลยผลการส่องของ Seer -->
                 <div id="pp-seer-result-box" class="hidden bg-indigo-950/90 border border-indigo-500/50 rounded-2xl p-3 text-center space-y-1">
                     <span class="text-[10px] text-indigo-300 font-bold uppercase tracking-wider block">👁️ ผลการส่องของผู้หยั่งรู้ (Seer):</span>
                     <div id="pp-seer-result-text" class="text-sm font-black text-amber-300">---</div>
@@ -334,6 +340,9 @@
                     <div id="pp-day-announcement-content" class="text-xs text-slate-200 leading-relaxed space-y-1.5"></div>
                 </div>
 
+                <!-- กล่องยิงสังหารกลางวงของ Hunter (แสดงเมื่อ Hunter ตายตอนกลางคืน - แนวทาง A) -->
+                <div id="pp-hunter-revenge-container" class="hidden space-y-2"></div>
+
                 <!-- นาฬิกาจับเวลาช่วงอภิปราย (Discussion Timer) -->
                 <div class="bg-slate-950/80 border border-slate-800 rounded-2xl p-3 text-center space-y-2">
                     <div class="flex items-center justify-between px-2">
@@ -371,13 +380,30 @@
                 <div id="pp-lynch-candidates-list" class="space-y-1.5 max-h-52 overflow-y-auto pr-1 text-xs"></div>
             </div>
 
-            <!-- สวิตช์สิทธิผู้ใหญ่บ้าน (Mayor Vote Toggle) -->
-            <div id="pp-mayor-vote-container" class="hidden bg-slate-950 p-2.5 rounded-xl border border-slate-800 flex items-center justify-between text-xs">
-                <span class="text-amber-300 font-bold"><i class="fa-solid fa-crown mr-1"></i> ผู้ใหญ่บ้าน (Mayor) มีชีวิตอยู่:</span>
-                <span class="text-[10px] text-slate-400">เสียงของผู้ใหญ่บ้านนับเป็น 2 คะแนน</span>
+            <!-- สวิตช์สิทธิผู้ใหญ่บ้าน & ปุ่มผลโหวตเสมอกัน -->
+            <div class="space-y-2">
+                <div id="pp-mayor-vote-container" class="hidden bg-slate-950 p-2.5 rounded-xl border border-amber-500/40 flex items-center justify-between text-xs">
+                    <span class="text-amber-300 font-bold"><i class="fa-solid fa-crown mr-1"></i> ผู้ใหญ่บ้าน (Mayor) มีชีวิตอยู่:</span>
+                    <span class="text-[10px] text-slate-400">กรณีผลโหวตเสมอ Mayor ชี้ตัดสิน</span>
+                </div>
+
+                <button type="button" id="pp-mayor-tie-btn" onclick="PassPlayEngine.toggleMayorTieSection()" class="hidden w-full py-2.5 bg-slate-950 hover:bg-slate-900 border border-amber-500/60 text-amber-300 font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 transition">
+                    <i class="fa-solid fa-scale-balanced text-amber-400"></i> ⚖️ ผลโหวตเสมอกัน ➔ ให้ Mayor ชี้ตัดสิน
+                </button>
+
+                <!-- กล่องเลือก Mayor ชี้ประหารกรณีเสมอ -->
+                <div id="pp-mayor-tie-box" class="hidden bg-slate-950 border border-amber-500/70 rounded-2xl p-3 space-y-2 text-xs">
+                    <span class="text-amber-300 font-bold block"><i class="fa-solid fa-crown mr-1"></i> Mayor เลือกชี้ผู้ถูกประหาร (กรณีผลโหวตเสมอ):</span>
+                    <select id="pp-mayor-tie-target" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2 text-white outline-none focus:border-amber-500">
+                        <option value="">-- เลือกผู้เล่นที่ Mayor ชี้ตัดสิน --</option>
+                    </select>
+                    <button type="button" onclick="PassPlayEngine.confirmMayorTieLynch()" class="w-full py-2 bg-gradient-to-r from-amber-600 to-orange-600 text-white font-bold text-xs rounded-xl shadow active:scale-95 transition">
+                        👑 ยืนยันการชี้ประหารโดย Mayor
+                    </button>
+                </div>
             </div>
 
-            <!-- ปุ่มยืนยันการประหาร -->
+            <!-- ปุ่มยืนยันการประหารปกติ -->
             <button onclick="PassPlayEngine.confirmLynchVote()" class="w-full py-3.5 bg-gradient-to-r from-rose-600 to-orange-600 hover:from-rose-500 hover:to-orange-500 text-white font-bold text-xs rounded-xl shadow-lg active:scale-95 transition flex items-center justify-center gap-2">
                 <i class="fa-solid fa-gavel"></i> ยืนยันผลการประหารชีวิต
             </button>
@@ -462,17 +488,17 @@
         // พจนานุกรมบทบาททั้งหมดในเกม Werewolf (12 บทบาท)
         const ALL_ROLES = {
             'Werewolf': { title: 'หมาป่า (Werewolf)', faction: 'ฝ่ายหมาป่า', icon: '🐺', desc: 'เลือกสังหารชาวบ้าน 1 คนยามค่ำคืนร่วมกับทีมหมาป่า' },
-            'WolfCub': { title: 'ลูกหมาป่า (Wolf Cub)', faction: 'ฝ่ายหมาป่า', icon: '🐺👶', desc: 'หากตาย ในคืนถัดไปทีมหมาป่าจะฆ่าได้ 2 คน' },
-            'AlphaWolf': { title: 'พญาหมาป่า (Alpha Wolf)', faction: 'ฝ่ายหมาป่า', icon: '🐺🩸', desc: 'มีพลังเปลี่ยนเหยื่อสังหารให้กลายเป็นหมาป่าร่วมทีม 1 ครั้งต่อเกม' },
+            'WolfCub': { title: 'ลูกหมาป่า (Wolf Cub)', faction: 'ฝ่ายหมาป่า', icon: '🐺👶', desc: 'หากถูกกำจัด ในคืนถัดไปทีมหมาป่าจะสังหารเหยื่อได้ 2 คน' },
+            'AlphaWolf': { title: 'พญาหมาป่า (Alpha Wolf)', faction: 'ฝ่ายหมาป่า', icon: '🐺🩸', desc: 'มีพลังกัดแพร่เชื้อเปลี่ยนเหยื่อสังหารให้เป็นหมาป่าร่วมทีมได้ 1 ครั้งต่อเกม' },
             'Seer': { title: 'ผู้หยั่งรู้ (Seer)', faction: 'ฝ่ายชาวบ้าน', icon: '👁️', desc: 'ส่องดูบทบาทจริงของผู้เล่นได้ 1 คนต่อคืน' },
-            'Bodyguard': { title: 'บอดี้การ์ด (Bodyguard)', faction: 'ฝ่ายชาวบ้าน', icon: '🛡️', desc: 'ปกป้องผู้เล่น 1 คนยามค่ำคืน ไม่ให้โดนหมาป่าฆ่า' },
-            'Hunter': { title: 'พรานป่า (Hunter)', faction: 'ฝ่ายชาวบ้าน', icon: '🏹', desc: 'หากเสียชีวิต จะมีสิทธิ์ยิงสังหารผู้เล่นอีก 1 คนตายตาม' },
+            'Bodyguard': { title: 'บอดี้การ์ด (Bodyguard)', faction: 'ฝ่ายชาวบ้าน', icon: '🛡️', desc: 'ปกป้องผู้เล่น 1 คนยามค่ำคืน ไม่ให้โดนหมาป่าฆ่า (ห้ามกันคนเดิมซ้ำ 2 คืนติดกัน)' },
+            'Hunter': { title: 'พรานป่า (Hunter)', faction: 'ฝ่ายชาวบ้าน', icon: '🏹', desc: 'หากเสียชีวิต มีสิทธิ์ยิงสังหารผู้เล่นอีก 1 คนตายตามทันที' },
             'Prince': { title: 'เจ้าชาย (Prince)', faction: 'ฝ่ายชาวบ้าน', icon: '🤴', desc: 'หากโดนโหวตประหารชีวิตครั้งแรก จะเปิดเผยตัวและรอดพ้นการประหารทันที' },
             'Silencer': { title: 'นักสาปแช่ง (Silencer)', faction: 'ฝ่ายชาวบ้าน', icon: '🔇', desc: 'สั่งปิดปากผู้เล่น 1 คนยามค่ำคืน ห้ามพูด/ออกเสียงในวันถัดไป' },
             'Villager': { title: 'ชาวบ้าน (Villager)', faction: 'ฝ่ายชาวบ้าน', icon: '👨‍🌾', desc: 'ไม่มีสกิลยามค่ำคืน เน้นตรรกะและการสังเกตช่วยโหวตประหาร' },
-            'Mayor': { title: 'ผู้ใหญ่บ้าน (Mayor)', faction: 'ฝ่ายชาวบ้าน', icon: '👑', desc: 'ตำแหน่งผู้ใหญ่บ้าน มีคะแนนโหวตประหารชีวิตนับเป็น 2 คะแนน' },
+            'Mayor': { title: 'ผู้ใหญ่บ้าน (Mayor)', faction: 'ฝ่ายชาวบ้าน', icon: '👑', desc: 'หากผลโหวตประหารเสมอกัน ผู้ใหญ่บ้านจะเป็นผู้ชี้ตัดสินประหาร' },
             'Fool': { title: 'คนบ้า (Fool)', faction: 'ฝ่ายอิสระ', icon: '🤡', desc: 'เป้าหมายชนะเดี่ยว: เนียนให้ตนเองโดนโหวตประหารชีวิตในตอนกลางวัน' },
-            'Doppelganger': { title: 'ผู้เลียนแบบ (Doppelganger)', faction: 'ฝ่ายอิสระ', icon: '🎭', desc: 'เลือกผู้เล่น 1 คนในคืนแรก หากคนนั้นตายจะสืบทอดบทบาททันที' }
+            'Doppelganger': { title: 'ผู้เลียนแบบ (Doppelganger)', faction: 'ฝ่ายอิสระ', icon: '🎭', desc: 'เลือกผู้เล่น 1 คนในคืนแรก หากคนนั้นตายจะสืบทอดบทบาทและฝั่งทันที' }
         };
 
         // การตั้งค่าเชื่อมต่อ Firebase Realtime Database
@@ -556,13 +582,20 @@
             currentDay: 1,            // วันที่กำลังเล่น
             nightSelections: {        // ค่าที่ GM เลือกในแต่ละคืน
                 wolfTarget: null,
+                wolfTarget2: null,
+                isAlphaInfecting: false,
                 seerTarget: null,
                 guardTarget: null,
-                silencerTarget: null
+                silencerTarget: null,
+                doppelgangerTarget: null
             },
-            lynchSelection: null,     // คนที่ถูกเลือกประหาร
-            timerInterval: null,      // อินเตอร์วัลนาฬิกา
-            timerSeconds: 180,        // เวลานับถอยหลังอภิปราย (วินาที)
+            lastGuardTarget: null,      // บันทึกเป้าหมายบอดี้การ์ดคืนก่อน (ห้ามกันซ้ำ)
+            extraKillNextNight: false, // สถานะลูกหมาป่า WolfCub ตาย ➔ คืนถัดไปฆ่า 2 คน
+            alphaAbilityUsed: false,   // พญาหมาป่า AlphaWolf ใช้สกิลแพร่เชื้อแล้วหรือยัง
+            pendingHunterShot: null,   // ข้อมูล Hunter ที่ตายตอนกลางคืน รอให้ยิงตอนเช้า (แนวทาง A)
+            lynchSelection: null,      // คนที่ถูกเลือกประหาร
+            timerInterval: null,       // อินเตอร์วัลนาฬิกา
+            timerSeconds: 180,         // เวลานับถอยหลังอภิปราย (วินาที)
             isTimerRunning: false,
 
             // สัดส่วนการ์ดเริ่มต้น
@@ -592,6 +625,21 @@
                 document.getElementById('pp-player-count-display').innerText = `${count} คน`;
                 const range = document.getElementById('pp-player-count-range');
                 if (range && parseInt(range.value) !== count) range.value = count;
+
+                // หากการ์ดรวมเกินจำนวนคน ให้ปรับลดส่วนเกินลง
+                let totalSelected = Object.values(this.roleCounts).reduce((sum, v) => sum + v, 0);
+                while (totalSelected > count) {
+                    for (let roleKey of Object.keys(this.roleCounts)) {
+                        if (this.roleCounts[roleKey] > 0) {
+                            this.roleCounts[roleKey]--;
+                            totalSelected--;
+                            const span = document.getElementById(`pp-count-${roleKey}`);
+                            if (span) span.innerText = this.roleCounts[roleKey];
+                            if (totalSelected <= count) break;
+                        }
+                    }
+                }
+                this.updateDeckSummary();
 
                 const listEl = document.getElementById('pp-player-names-list');
                 if (!listEl) return;
@@ -637,23 +685,60 @@
                         </div>
                     `;
                 }).join('');
+                this.updateDeckSummary();
             },
 
             adjustRoleCount(roleKey, delta) {
                 const current = this.roleCounts[roleKey] || 0;
+                const countInput = document.getElementById('pp-player-count-range');
+                const targetPlayerCount = countInput ? parseInt(countInput.value) : 6;
+
+                if (delta > 0) {
+                    const totalSelected = Object.values(this.roleCounts).reduce((sum, v) => sum + v, 0);
+                    if (totalSelected >= targetPlayerCount) {
+                        showToast(`เลือกการ์ดบทบาทครบ ${targetPlayerCount} ใบตามจำนวนคนแล้ว`, "fa-triangle-exclamation");
+                        return;
+                    }
+                }
+
                 const next = Math.max(0, current + delta);
                 this.roleCounts[roleKey] = next;
                 const span = document.getElementById(`pp-count-${roleKey}`);
                 if (span) span.innerText = next;
+                this.updateDeckSummary();
             },
 
-            // กดเริ่มเล่นเกม (เริ่มนับสถิติ Firebase และสุ่มการ์ด)
+            updateDeckSummary() {
+                const countInput = document.getElementById('pp-player-count-range');
+                const targetPlayerCount = countInput ? parseInt(countInput.value) : 6;
+                const totalSelected = Object.values(this.roleCounts).reduce((sum, v) => sum + v, 0);
+
+                const counterSpan = document.getElementById('pp-deck-count-summary');
+                if (counterSpan) {
+                    counterSpan.innerText = `${totalSelected} / ${targetPlayerCount} ใบ`;
+                    if (totalSelected === targetPlayerCount) {
+                        counterSpan.className = 'font-bold text-emerald-400 bg-slate-900 py-0.5 px-2.5 rounded-lg border border-emerald-500/40';
+                    } else if (totalSelected < targetPlayerCount) {
+                        counterSpan.className = 'font-bold text-amber-300 bg-slate-900 py-0.5 px-2.5 rounded-lg border border-amber-500/40';
+                    } else {
+                        counterSpan.className = 'font-bold text-rose-400 bg-slate-900 py-0.5 px-2.5 rounded-lg border border-rose-500/40';
+                    }
+                }
+            },
+
+            // กดเริ่มเล่นเกม
             startGame() {
                 const countInput = document.getElementById('pp-player-count-range');
                 const count = countInput ? parseInt(countInput.value) : 6;
                 this.players = [];
 
-                // 1. ส่งสถิติเกมออฟไลน์ไปยัง Firebase (ตามข้อตกลง)
+                // Reset สถานะพิเศษ
+                this.lastGuardTarget = null;
+                this.extraKillNextNight = false;
+                this.alphaAbilityUsed = false;
+                this.pendingHunterShot = null;
+
+                // 1. ส่งสถิติเกมไปยัง Firebase
                 if (isFirebaseActive && dbRef) {
                     try {
                         dbRef.ref('stats/werewolf/offlineGamesCount').transaction(curr => (curr || 0) + 1);
@@ -673,7 +758,9 @@
                         isAlive: true,
                         isSilenced: false,
                         isMayor: false,
-                        princeRevealed: false
+                        princeRevealed: false,
+                        doppelTarget: null,
+                        doppelInherited: false
                     });
                 }
 
@@ -684,9 +771,8 @@
                     for (let i = 0; i < c; i++) deck.push(roleKey);
                 });
 
-                // หากการ์ดไม่พอ ให้เติมชาวบ้าน (Villager)
+                // หากเลือกการ์ดไม่ครบ ให้เติมชาวบ้าน (Villager)
                 while (deck.length < count) deck.push('Villager');
-                // สุ่มสับการ์ด
                 deck = shuffleArray(deck);
 
                 // 4. มอบบทบาทให้ผู้เล่น
@@ -723,7 +809,7 @@
                 document.getElementById('pp-card-icon').innerText = r.icon;
                 document.getElementById('pp-card-title').innerText = r.title;
                 document.getElementById('pp-desc-title').innerText = `📜 รายละเอียด: ${r.title}`;
-                document.getElementById('pp-desc-text').innerHTML = `${r.desc} <br><br><b>เป้าหมาย:</b> ${r.faction === 'ฝ่ายหมาป่า' ? 'กำจัดชาวบ้านให้หมด' : 'กำจัดหมาป่าทั้งหมด'}`;
+                document.getElementById('pp-desc-text').innerHTML = `${r.desc} <br><br><b>เป้าหมาย:</b> ${r.faction === 'ฝ่ายหมาป่า' ? 'กำจัดชาวบ้านให้หมด' : (r.faction === 'ฝ่ายอิสระ' ? 'ทำตามเงื่อนไขชนะเดี่ยว' : 'กำจัดหมาป่าทั้งหมด')}`;
             },
 
             revealCurrentRole() {
@@ -741,14 +827,12 @@
                 if (this.currentRevealIndex < this.players.length) {
                     this.setupRevealUI(this.currentRevealIndex);
                 } else {
-                    // ทุกคนดูครบแล้ว ➔ แสดงหน้าจอล็อกส่งคืนให้ GM
                     document.getElementById('pp-privacy-cover').classList.add('hidden');
                     document.getElementById('pp-role-card-container').classList.add('hidden');
                     document.getElementById('pp-handoff-to-gm-cover').classList.remove('hidden');
                 }
             },
 
-            // GM ปลดล็อกเข้าสู่หน้า Master Dashboard
             unlockGMDashboard() {
                 WerewolfRouter.showScreen('screen-pp-gm-dashboard');
                 this.renderMasterPlayerList();
@@ -756,7 +840,6 @@
                 showToast("ยินดีต้อนรับ GM สู่ห้องคุมเกม!", "fa-crown");
             },
 
-            // สลับเปิด/ปิดสมุดจด GM Master List
             toggleMasterList() {
                 document.getElementById('pp-master-player-list').classList.toggle('hidden');
                 document.getElementById('pp-master-list-arrow').classList.toggle('rotate-180');
@@ -767,7 +850,6 @@
                 document.getElementById('pp-master-list-day-arrow').classList.toggle('rotate-180');
             },
 
-            // วาดตารางรายชื่อผู้เล่นทั้งหมดในสมุดจด GM (Master Player List)
             renderMasterPlayerList() {
                 const aliveCount = this.players.filter(p => p.isAlive).length;
                 const counterEl = document.getElementById('pp-alive-counter');
@@ -805,7 +887,15 @@
             setupNightPhaseUI() {
                 document.getElementById('pp-night-number').innerText = this.currentNight;
                 document.getElementById('pp-seer-result-box').classList.add('hidden');
-                this.nightSelections = { wolfTarget: null, seerTarget: null, guardTarget: null, silencerTarget: null };
+                this.nightSelections = {
+                    wolfTarget: null,
+                    wolfTarget2: null,
+                    isAlphaInfecting: false,
+                    seerTarget: null,
+                    guardTarget: null,
+                    silencerTarget: null,
+                    doppelgangerTarget: null
+                };
 
                 const stepsContainer = document.getElementById('pp-night-action-steps');
                 if (!stepsContainer) return;
@@ -814,23 +904,62 @@
                 const hasSeer = this.players.some(p => p.role === 'Seer' && p.isAlive);
                 const hasGuard = this.players.some(p => p.role === 'Bodyguard' && p.isAlive);
                 const hasSilencer = this.players.some(p => p.role === 'Silencer' && p.isAlive);
+                const hasAlphaWolf = this.players.some(p => p.role === 'AlphaWolf' && p.isAlive);
+                const hasDoppelganger = this.players.some(p => p.role === 'Doppelganger' && p.isAlive);
 
                 let stepsHtml = '';
+                let stepNum = 1;
 
-                // Step 1: หมาป่า (Werewolves)
+                // Step 0: ผู้เลียนแบบ Doppelganger (คืนที่ 1 เท่านั้น)
+                if (this.currentNight === 1 && hasDoppelganger) {
+                    stepsHtml += `
+                        <div class="bg-slate-900/90 border border-purple-500/30 rounded-2xl p-3.5 space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="font-bold text-purple-300"><i class="fa-solid fa-masks-theater mr-1"></i> ${stepNum++}. ผู้เลียนแบบ (Doppelganger):</span>
+                                <span class="text-[10px] text-slate-400">เลือกเป้าหมาย 1 คน (คืนแรก)</span>
+                            </div>
+                            <p class="text-[11px] text-slate-300 bg-slate-950 p-2 rounded-xl border border-slate-800">
+                                📢 <b>สคริปต์ GM:</b> <i>"ทุกคนหลับตา... ขอให้ผู้เลียนแบบลืมตา ชี้เลือกผู้เล่น 1 คนที่ต้องการสืบทอดบทบาทหากคนนั้นเสียชีวิต"</i>
+                            </p>
+                            <select onchange="PassPlayEngine.handleDoppelgangerSelection(this.value)" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2 text-white outline-none focus:border-purple-500">
+                                <option value="">-- GM เลือกคนที่ Doppelganger ชี้ --</option>
+                                ${alivePlayers.filter(p => p.role !== 'Doppelganger').map(p => `<option value="${p.id}">${p.num}. ${p.name}</option>`).join('')}
+                            </select>
+                        </div>
+                    `;
+                }
+
+                // Step 1: ทีมฝ่ายหมาป่า (Werewolves)
+                const isDoubleKill = this.extraKillNextNight;
                 stepsHtml += `
                     <div class="bg-slate-900/90 border border-rose-500/30 rounded-2xl p-3.5 space-y-2">
                         <div class="flex items-center justify-between">
-                            <span class="font-bold text-rose-400"><i class="fa-solid fa-paw mr-1"></i> 1. ทีมฝ่ายหมาป่า (Werewolves):</span>
-                            <span class="text-[10px] text-slate-400">เลือกเหยื่อ 1 คน</span>
+                            <span class="font-bold text-rose-400"><i class="fa-solid fa-paw mr-1"></i> ${stepNum++}. ทีมฝ่ายหมาป่า (Werewolves):</span>
+                            <span class="text-[10px] ${isDoubleKill ? 'text-amber-300 font-bold' : 'text-slate-400'}">
+                                ${isDoubleKill ? '🔥 สกิล WolfCub ทำงาน! เลือกสังหาร 2 คน' : 'เลือกเหยื่อ 1 คน'}
+                            </span>
                         </div>
                         <p class="text-[11px] text-slate-300 bg-slate-950 p-2 rounded-xl border border-slate-800">
-                            📢 <b>สคริปต์ GM:</b> <i>"ทุกคนหลับตา... ขอให้ทีมหมาป่าลืมตา สบตากัน และชี้เลือกเหยื่อ 1 คน"</i>
+                            📢 <b>สคริปต์ GM:</b> <i>"ทุกคนหลับตา... ขอให้ทีมหมาป่าลืมตา สบตากัน และชี้เลือกเหยื่อ ${isDoubleKill ? '2 คน' : '1 คน'}"</i>
                         </p>
-                        <select onchange="PassPlayEngine.nightSelections.wolfTarget = this.value" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2 text-white outline-none focus:border-rose-500">
-                            <option value="">-- GM เลือกเหยื่อที่หมาป่าชี้ --</option>
-                            ${alivePlayers.map(p => `<option value="${p.id}">${p.num}. ${p.name} [${p.role}]</option>`).join('')}
-                        </select>
+                        ${hasAlphaWolf && !this.alphaAbilityUsed ? `
+                            <label class="flex items-center gap-2 text-xs text-rose-300 font-bold bg-slate-950 p-2 rounded-xl border border-rose-900/50 cursor-pointer">
+                                <input type="checkbox" id="chk-alpha-infect" onchange="PassPlayEngine.nightSelections.isAlphaInfecting = this.checked" class="accent-rose-500 w-4 h-4">
+                                <span>🩸 ใช้พลังพญาหมาป่า (Alpha Wolf): กัดแพร่เชื้อเปลี่ยนเหยื่อเป็นหมาป่า (ใช้ได้ 1 ครั้ง/เกม)</span>
+                            </label>
+                        ` : ''}
+                        <div class="space-y-2">
+                            <select onchange="PassPlayEngine.nightSelections.wolfTarget = this.value" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2 text-white outline-none focus:border-rose-500">
+                                <option value="">-- GM เลือกเหยื่อที่หมาป่าชี้ ${isDoubleKill ? '(คนที่ 1)' : ''} --</option>
+                                ${alivePlayers.map(p => `<option value="${p.id}">${p.num}. ${p.name} [${ALL_ROLES[p.role]?.title || p.role}]</option>`).join('')}
+                            </select>
+                            ${isDoubleKill ? `
+                                <select onchange="PassPlayEngine.nightSelections.wolfTarget2 = this.value" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2 text-white outline-none focus:border-rose-500">
+                                    <option value="">-- GM เลือกเหยื่อหมาป่าคนที่ 2 (จากสกิล WolfCub) --</option>
+                                    ${alivePlayers.map(p => `<option value="${p.id}">${p.num}. ${p.name} [${ALL_ROLES[p.role]?.title || p.role}]</option>`).join('')}
+                                </select>
+                            ` : ''}
+                        </div>
                     </div>
                 `;
 
@@ -839,7 +968,7 @@
                     stepsHtml += `
                         <div class="bg-slate-900/90 border border-indigo-500/30 rounded-2xl p-3.5 space-y-2">
                             <div class="flex items-center justify-between">
-                                <span class="font-bold text-indigo-300"><i class="fa-solid fa-eye mr-1"></i> 2. ผู้หยั่งรู้ (Seer):</span>
+                                <span class="font-bold text-indigo-300"><i class="fa-solid fa-eye mr-1"></i> ${stepNum++}. ผู้หยั่งรู้ (Seer):</span>
                                 <span class="text-[10px] text-slate-400">ส่องบทบาท 1 คน</span>
                             </div>
                             <p class="text-[11px] text-slate-300 bg-slate-950 p-2 rounded-xl border border-slate-800">
@@ -847,7 +976,7 @@
                             </p>
                             <select onchange="PassPlayEngine.handleSeerInspection(this.value)" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2 text-white outline-none focus:border-indigo-500">
                                 <option value="">-- GM เลือกคนที่ Seer ชี้ (ระบบจะเฉลยให้ GM ทันที) --</option>
-                                ${this.players.map(p => `<option value="${p.id}">${p.num}. ${p.name}</option>`).join('')}
+                                ${this.players.map(p => `<option value="${p.id}">${p.num}. ${p.name} [${ALL_ROLES[p.role]?.title || p.role}]</option>`).join('')}
                             </select>
                         </div>
                     `;
@@ -858,15 +987,18 @@
                     stepsHtml += `
                         <div class="bg-slate-900/90 border border-emerald-500/30 rounded-2xl p-3.5 space-y-2">
                             <div class="flex items-center justify-between">
-                                <span class="font-bold text-emerald-400"><i class="fa-solid fa-shield mr-1"></i> 3. บอดี้การ์ด (Bodyguard):</span>
-                                <span class="text-[10px] text-slate-400">เลือกปกป้อง 1 คน</span>
+                                <span class="font-bold text-emerald-400"><i class="fa-solid fa-shield mr-1"></i> ${stepNum++}. บอดี้การ์ด (Bodyguard):</span>
+                                <span class="text-[10px] text-slate-400">เลือกปกป้อง 1 คน (ห้ามซ้ำคืนติด)</span>
                             </div>
                             <p class="text-[11px] text-slate-300 bg-slate-950 p-2 rounded-xl border border-slate-800">
                                 📢 <b>สคริปต์ GM:</b> <i>"ผู้หยั่งรู้หลับตา... ขอให้บอดี้การ์ดลืมตา และชี้เลือกผู้เล่นที่ต้องการปกป้อง 1 คน"</i>
                             </p>
                             <select onchange="PassPlayEngine.nightSelections.guardTarget = this.value" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2 text-white outline-none focus:border-emerald-500">
                                 <option value="">-- GM เลือกคนที่บอดี้การ์ดปกป้อง --</option>
-                                ${alivePlayers.map(p => `<option value="${p.id}">${p.num}. ${p.name}</option>`).join('')}
+                                ${alivePlayers.map(p => {
+                                    const isBlocked = p.id === PassPlayEngine.lastGuardTarget;
+                                    return `<option value="${p.id}" ${isBlocked ? 'disabled' : ''}>${p.num}. ${p.name} ${isBlocked ? '(❌ ห้ามกันซ้ำคืนติด)' : ''}</option>`;
+                                }).join('')}
                             </select>
                         </div>
                     `;
@@ -877,7 +1009,7 @@
                     stepsHtml += `
                         <div class="bg-slate-900/90 border border-purple-500/30 rounded-2xl p-3.5 space-y-2">
                             <div class="flex items-center justify-between">
-                                <span class="font-bold text-purple-300"><i class="fa-solid fa-volume-xmark mr-1"></i> 4. นักสาปแช่ง (Silencer):</span>
+                                <span class="font-bold text-purple-300"><i class="fa-solid fa-volume-xmark mr-1"></i> ${stepNum++}. นักสาปแช่ง (Silencer):</span>
                                 <span class="text-[10px] text-slate-400">สั่งปิดปาก 1 คน</span>
                             </div>
                             <p class="text-[11px] text-slate-300 bg-slate-950 p-2 rounded-xl border border-slate-800">
@@ -894,7 +1026,14 @@
                 stepsContainer.innerHTML = stepsHtml;
             },
 
-            // เมื่อ Seer ส่อง ➔ ระบบแสดงผลลัพธ์บนหน้าจอ GM ทันที
+            handleDoppelgangerSelection(targetId) {
+                this.nightSelections.doppelgangerTarget = targetId;
+                const dop = this.players.find(p => p.role === 'Doppelganger');
+                if (dop) {
+                    dop.doppelTarget = targetId;
+                }
+            },
+
             handleSeerInspection(targetId) {
                 this.nightSelections.seerTarget = targetId;
                 const resultBox = document.getElementById('pp-seer-result-box');
@@ -911,25 +1050,69 @@
                 }
             },
 
+            registerPlayerDeath(player) {
+                if (!player || !player.isAlive) return;
+                player.isAlive = false;
+
+                // หากคนตายคือ WolfCub ➔ คืนถัดไปหมาป่าสังหารได้ 2 คน
+                if (player.role === 'WolfCub') {
+                    this.extraKillNextNight = true;
+                }
+
+                // ตรวจสอบ Doppelganger ➔ สืบทอดบทบาทหากเป้าหมายตาย
+                this.players.forEach(p => {
+                    if (p.isAlive && p.role === 'Doppelganger' && p.doppelTarget === player.id && !p.doppelInherited) {
+                        p.role = player.role;
+                        p.doppelInherited = true;
+                        if (p.role === 'Mayor') p.isMayor = true;
+                        alert(`🎭 ปาฏิหาริย์ Doppelganger!\n\nผู้เล่น ${p.name} (Doppelganger) ได้สืบทอดบทบาทใหม่เป็น: "${ALL_ROLES[p.role]?.title || p.role}" เนื่องจาก ${player.name} เสียชีวิต!`);
+                    }
+                });
+            },
+
             // ประมวลผลกลางคืน & เข้าสู่ช่วงรุ่งเช้า
             processNightResults() {
                 const wolfTarget = this.nightSelections.wolfTarget;
+                const wolfTarget2 = this.nightSelections.wolfTarget2;
+                const isAlphaInfecting = this.nightSelections.isAlphaInfecting;
                 const guardTarget = this.nightSelections.guardTarget;
                 const silencerTarget = this.nightSelections.silencerTarget;
+
+                // บันทึกบอดี้การ์ดเป้าหมายคืนนี้ เพื่อใช้ล็อกในคืนถัดไป
+                this.lastGuardTarget = guardTarget || null;
 
                 // รีเซ็ตสถานะถูกปิดปากรอบก่อน
                 this.players.forEach(p => p.isSilenced = false);
 
-                let killedPlayer = null;
-                // ถ้าหมาป่าเลือกเป้าหมาย และเป้าหมายไม่ได้ถูกบอดี้การ์ดกันไว้
+                // รีเซ็ต extraKillNextNight หลังใช้งานคืนนี้
+                this.extraKillNextNight = false;
+
+                let killedPlayers = [];
+                let infectedPlayer = null;
+
+                // 1. จัดการเป้าหมายหมาป่า (Alpha Wolf / Normal Kill)
                 if (wolfTarget) {
-                    if (wolfTarget !== guardTarget) {
-                        killedPlayer = this.players.find(p => p.id === wolfTarget);
-                        if (killedPlayer) killedPlayer.isAlive = false;
+                    const targetP = this.players.find(p => p.id === wolfTarget);
+                    if (isAlphaInfecting && !this.alphaAbilityUsed && targetP) {
+                        this.alphaAbilityUsed = true;
+                        targetP.role = 'Werewolf';
+                        infectedPlayer = targetP;
+                    } else if (wolfTarget !== guardTarget && targetP) {
+                        this.registerPlayerDeath(targetP);
+                        killedPlayers.push(targetP);
                     }
                 }
 
-                // ถ้ามีคนถูกสั่งปิดปาก
+                // 2. จัดการเป้าหมายหมาป่าคนที่ 2 (จาก WolfCub)
+                if (wolfTarget2 && wolfTarget2 !== guardTarget) {
+                    const targetP2 = this.players.find(p => p.id === wolfTarget2);
+                    if (targetP2 && targetP2.isAlive) {
+                        this.registerPlayerDeath(targetP2);
+                        killedPlayers.push(targetP2);
+                    }
+                }
+
+                // 3. จัดการนักสาปแช่ง
                 let silencedPlayer = null;
                 if (silencerTarget) {
                     silencedPlayer = this.players.find(p => p.id === silencerTarget);
@@ -945,8 +1128,11 @@
 
                 // เตรียมคำประกาศสำหรับช่วงเช้า
                 const announcements = [];
-                if (killedPlayer) {
-                    announcements.push(`💀 <b class="text-rose-400">มีผู้เสียชีวิตยามค่ำคืน:</b> ผู้เล่น <b>${killedPlayer.name}</b> ถูกหมาป่าสังหาร!`);
+                if (killedPlayers.length > 0) {
+                    const names = killedPlayers.map(p => `<b>${p.name}</b>`).join(' และ ');
+                    announcements.push(`💀 <b class="text-rose-400">มีผู้เสียชีวิตยามค่ำคืน:</b> ผู้เล่น ${names} ถูกหมาป่าสังหาร!`);
+                } else if (infectedPlayer) {
+                    announcements.push(`🐺🩸 <b class="text-rose-400">ข่าวเล่าลือยามค่ำคืน:</b> คืนนี้ไม่มีผู้เสียชีวิต แต่พญาหมาป่าได้ทำการแพร่เชื้อ! มีผู้เล่น 1 คนถูกเปลี่ยนฝั่งเป็นหมาป่า!`);
                 } else {
                     announcements.push(`✨ <b class="text-emerald-400">ข่าวดี:</b> คืนนี้ไม่มีใครเสียชีวิต! (บอดี้การ์ดอาจปกป้องเหยื่อไว้ได้)`);
                 }
@@ -955,15 +1141,83 @@
                     announcements.push(`🔇 <b class="text-purple-400">คำสาปปิดปาก:</b> ผู้เล่น <b>${silencedPlayer.name}</b> ถูกสั่งปิดปาก ห้ามพูดหรือออกเสียงใดๆ ในวันนี้!`);
                 }
 
+                // ตรวจสอบ Hunter ตายกลางคืน ➔ รอให้ยิงย้อนหลังตอนเช้า (แนวทาง A)
+                const hunterKilled = killedPlayers.find(p => p.role === 'Hunter');
+                if (hunterKilled) {
+                    this.pendingHunterShot = hunterKilled;
+                } else {
+                    this.pendingHunterShot = null;
+                }
+
                 announcements.push(`💬 ให้ทุกคนเริ่มพูดคุย อภิปราย ซักไซ้ และหาตัวหมาป่า`);
 
                 document.getElementById('pp-day-number').innerText = this.currentDay;
                 document.getElementById('pp-day-announcement-content').innerHTML = announcements.map(a => `<div class="bg-slate-950/80 p-2 rounded-xl border border-slate-800">${a}</div>`).join('');
 
+                // เคลียร์/วาด UI Hunter ยิงย้อนหลังยามเช้า
+                this.renderHunterRevengeBox();
+
                 this.renderMasterPlayerList();
                 this.resetTimer();
                 WerewolfRouter.showScreen('screen-pp-day-phase');
                 showToast("รุ่งเช้ามาถึงแล้ว ประกาศผลให้ทุกคนฟัง", "fa-sun");
+            },
+
+            renderHunterRevengeBox() {
+                const container = document.getElementById('pp-hunter-revenge-container');
+                if (!container) return;
+
+                if (!this.pendingHunterShot) {
+                    container.innerHTML = '';
+                    container.classList.add('hidden');
+                    return;
+                }
+
+                const alivePlayers = this.players.filter(p => p.isAlive);
+                container.classList.remove('hidden');
+                container.innerHTML = `
+                    <div class="bg-rose-950/90 border-2 border-rose-500 rounded-2xl p-3.5 space-y-2 text-xs">
+                        <div class="flex items-center gap-2 text-rose-300 font-black text-sm">
+                            <i class="fa-solid fa-crosshairs text-rose-400 text-lg"></i> 🏹 สกิลพรานป่า (Hunter) ทำงาน!
+                        </div>
+                        <p class="text-slate-200">
+                            ผู้เล่น <b class="text-amber-300">${this.pendingHunterShot.name}</b> (พรานป่า) เสียชีวิตเมื่อคืน!<br>
+                            ขอให้ลุกขึ้นชี้สังหารผู้เล่นอีก 1 คนต่อหน้าทุกคนกลางวงทันที
+                        </p>
+                        <div class="flex gap-2 pt-1">
+                            <select id="pp-hunter-shot-target" class="flex-1 bg-slate-900 border border-slate-700 rounded-xl p-2 text-white outline-none focus:border-rose-500 text-xs">
+                                <option value="">-- GM เลือกผู้เล่นที่ Hunter ชี้ยิง --</option>
+                                ${alivePlayers.map(p => `<option value="${p.id}">${p.num}. ${p.name}</option>`).join('')}
+                            </select>
+                            <button type="button" onclick="PassPlayEngine.executeHunterNightShot()" class="px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs rounded-xl shadow active:scale-95 transition">
+                                🏹 ยืนยันการยิง
+                            </button>
+                        </div>
+                    </div>
+                `;
+            },
+
+            executeHunterNightShot() {
+                const targetId = document.getElementById('pp-hunter-shot-target')?.value;
+                if (!targetId) {
+                    showToast("กรุณาเลือกผู้เล่นที่ Hunter ชี้ยิง", "fa-triangle-exclamation");
+                    return;
+                }
+
+                const targetP = this.players.find(p => p.id === targetId);
+                if (!targetP) return;
+
+                this.registerPlayerDeath(targetP);
+                alert(`🏹 กระสุนของพรานป่า (${this.pendingHunterShot.name}) ยิงถูก ${targetP.name} เสียชีวิตตามไปด้วย!`);
+
+                this.pendingHunterShot = null;
+                this.renderHunterRevengeBox();
+                this.renderMasterPlayerList();
+
+                const winResult = this.checkWinCondition();
+                if (winResult) {
+                    this.showGameOverScreen(winResult);
+                }
             },
 
             // นาฬิกาจับเวลาอภิปราย
@@ -1029,7 +1283,7 @@
                     <label class="flex items-center justify-between p-2.5 bg-slate-950 hover:bg-slate-900 border border-slate-800 rounded-xl cursor-pointer transition">
                         <div class="flex items-center gap-2">
                             <input type="radio" name="pp-lynch-target" value="SKIP" onchange="PassPlayEngine.lynchSelection = this.value" class="accent-amber-500 w-4 h-4">
-                            <span class="font-bold text-amber-300">🚫 ไม่มีการประหาร (คะแนนเสียงเสมอกัน / ข้าม)</span>
+                            <span class="font-bold text-amber-300">🚫 ข้ามการประหาร (ไม่มีการประหารชีวิตในวันนี้)</span>
                         </div>
                     </label>
                 `;
@@ -1038,13 +1292,51 @@
                 const mayorBox = document.getElementById('pp-mayor-vote-container');
                 if (mayorBox) mayorBox.classList.toggle('hidden', !hasMayor);
 
+                const mayorTieBtn = document.getElementById('pp-mayor-tie-btn');
+                if (mayorTieBtn) mayorTieBtn.classList.toggle('hidden', !hasMayor);
+
+                // ซ่อนกล่อง Mayor ชี้เสมอไว้ก่อน
+                const mayorTieBox = document.getElementById('pp-mayor-tie-box');
+                if (mayorTieBox) mayorTieBox.classList.add('hidden');
+
+                // อัปเดตรายชื่อใน Dropdown ของ Mayor Tie
+                const mayorSelect = document.getElementById('pp-mayor-tie-target');
+                if (mayorSelect) {
+                    mayorSelect.innerHTML = `<option value="">-- เลือกผู้เล่นที่ Mayor ชี้ตัดสิน --</option>` +
+                        alivePlayers.map(p => `<option value="${p.id}">${p.num}. ${p.name} [${ALL_ROLES[p.role]?.title || p.role}]</option>`).join('');
+                }
+
                 WerewolfRouter.showScreen('screen-pp-lynch-phase');
             },
 
-            // ยืนยันผลการประหารชีวิต พร้อมเช็ค Trait สกิลบทบาทพิเศษ
+            toggleMayorTieSection() {
+                const hasMayor = this.players.some(p => p.isMayor && p.isAlive);
+                if (!hasMayor) {
+                    showToast("ผู้ใหญ่บ้าน (Mayor) เสียชีวิตแล้ว ไม่สามารถใช้สิทธิ์ชี้ตัดสินได้", "fa-triangle-exclamation");
+                    const box = document.getElementById('pp-mayor-tie-box');
+                    if (box) box.classList.add('hidden');
+                    return;
+                }
+                const box = document.getElementById('pp-mayor-tie-box');
+                if (box) box.classList.toggle('hidden');
+            },
+
+            confirmMayorTieLynch() {
+                const targetId = document.getElementById('pp-mayor-tie-target')?.value;
+                if (!targetId) {
+                    showToast("กรุณาเลือกผู้เล่นที่ Mayor ชี้ตัดสิน", "fa-triangle-exclamation");
+                    return;
+                }
+                const targetP = this.players.find(p => p.id === targetId);
+                if (!targetP) return;
+
+                alert(`👑 ผลโหวตออกมาเสมอกัน!\n\nผู้ใหญ่บ้าน (Mayor) ใช้สิทธิ์ชี้ตัดสินประหารชีวิต: ${targetP.name}!`);
+                this.executeLynchOnPlayer(targetP);
+            },
+
             confirmLynchVote() {
                 if (!this.lynchSelection) {
-                    showToast("กรุณาเลือกผู้ที่ถูกโหวตประหาร หรือเลือกข้ามการประหาร", "fa-triangle-exclamation");
+                    showToast("กรุณาเลือกผู้ถูกประหาร เลือกข้าม หรือกดปุ่มผลโหวตเสมอ", "fa-triangle-exclamation");
                     return;
                 }
 
@@ -1057,7 +1349,12 @@
                 const targetPlayer = this.players.find(p => p.id === this.lynchSelection);
                 if (!targetPlayer) return;
 
-                // ตรวจสอบบทบาทคนบ้า (Fool) ➔ ชนะทันที!
+                alert(`💀 ผลการโหวตประหารชีวิต:\n\nผู้เล่น ${targetPlayer.name} ถูกตัดสินประหารชีวิต!`);
+                this.executeLynchOnPlayer(targetPlayer);
+            },
+
+            executeLynchOnPlayer(targetPlayer) {
+                // 1. ตรวจสอบบทบาทคนบ้า (Fool) ➔ ชนะทันที!
                 if (targetPlayer.role === 'Fool') {
                     this.showGameOverScreen({
                         winner: 'fool',
@@ -1067,7 +1364,7 @@
                     return;
                 }
 
-                // ตรวจสอบบทบาทเจ้าชาย (Prince) ➔ รอดพ้นการประหารครั้งแรก!
+                // 2. ตรวจสอบบทบาทเจ้าชาย (Prince) ➔ รอดพ้นการประหารครั้งแรก!
                 if (targetPlayer.role === 'Prince' && !targetPlayer.princeRevealed) {
                     targetPlayer.princeRevealed = true;
                     alert(`🤴 ปาฏิหาริย์เกิดขึ้น!\n\nผู้เล่น ${targetPlayer.name} เป็น "เจ้าชาย (Prince)"!\nทำการเปิดเผยตัวตนต่อหน้าทุกคน และรอดพ้นจากการประหารชีวิตในครั้งนี้!`);
@@ -1075,11 +1372,10 @@
                     return;
                 }
 
-                // ประหารชีวิตผู้เล่น
-                targetPlayer.isAlive = false;
-                alert(`💀 ผลการโหวตประหารชีวิต:\n\nผู้เล่น ${targetPlayer.name} ถูกตัดสินประหารชีวิตและเสียชีวิตแล้ว!`);
+                // 3. ประหารชีวิตผู้เล่น
+                this.registerPlayerDeath(targetPlayer);
 
-                // ตรวจสอบบทบาทพรานป่า (Hunter) ➔ ยิงคนตายตาม
+                // 4. ตรวจสอบบทบาทพรานป่า (Hunter) ➔ ยิงคนตายตาม
                 if (targetPlayer.role === 'Hunter') {
                     const aliveRemaining = this.players.filter(p => p.isAlive);
                     if (aliveRemaining.length > 0) {
@@ -1087,14 +1383,14 @@
                         if (hunterTargetName) {
                             const hunterVictim = aliveRemaining.find(p => p.name.includes(hunterTargetName) || p.num.toString() === hunterTargetName.trim());
                             if (hunterVictim) {
-                                hunterVictim.isAlive = false;
+                                this.registerPlayerDeath(hunterVictim);
                                 alert(`🏹 กระสุนของพรานป่ายิงถูก ${hunterVictim.name} เสียชีวิตตามไปด้วย!`);
                             }
                         }
                     }
                 }
 
-                // ตรวจสอบเงื่อนไขแพ้ชนะหลังการประหาร
+                // 5. ตรวจสอบเงื่อนไขแพ้ชนะหลังการประหาร
                 const winResult = this.checkWinCondition();
                 if (winResult) {
                     this.showGameOverScreen(winResult);
@@ -1117,9 +1413,9 @@
             checkWinCondition() {
                 const alive = this.players.filter(p => p.isAlive);
                 const wolves = alive.filter(p => ALL_ROLES[p.role]?.faction === 'ฝ่ายหมาป่า');
-                const town = alive.filter(p => ALL_ROLES[p.role]?.faction === 'ฝ่ายชาวบ้าน');
+                const nonWolvesCount = alive.length - wolves.length;
 
-                // 1. หมาป่าตายหมด ➔ ชาวบ้านชนะ
+                // 1. หมาป่าตายหมด ➔ ฝ่ายชาวบ้านชนะ
                 if (wolves.length === 0) {
                     return {
                         winner: 'town',
@@ -1128,12 +1424,12 @@
                     };
                 }
 
-                // 2. จำนวนหมาป่า >= จำนวนชาวบ้านที่เหลืออยู่ ➔ หมาป่าชนะ
-                if (wolves.length >= town.length) {
+                // 2. จำนวนหมาป่า >= จำนวนคนที่ไม่ใช่หมาป่าทั้งหมด ➔ ฝ่ายหมาป่าชนะ
+                if (wolves.length >= nonWolvesCount) {
                     return {
                         winner: 'wolves',
                         title: '🐺 ฝ่ายหมาป่าเป็นฝ่ายชนะ!',
-                        desc: 'หมาป่ามีจำนวนเทียบเท่าหรือมากกว่าชาวบ้านแล้ว หมู่บ้านถูกทำลาย!'
+                        desc: 'หมาป่ามีจำนวนเทียบเท่าหรือมากกว่าคนในหมู่บ้านแล้ว หมู่บ้านถูกทำลาย!'
                     };
                 }
 
@@ -1179,12 +1475,10 @@
             userName: null,
 
             createRoom() {
-                // พื้นที่สำหรับเขียนฟังก์ชันสร้างห้องเชื่อมต่อ Firebase ในอนาคต
                 showToast("ระบบสร้างห้องออนไลน์จะเปิดใช้งานในเวอร์ชันถัดไป", "fa-clock");
             },
 
             joinRoom(code) {
-                // พื้นที่สำหรับเขียนฟังก์ชันเข้าร่วมห้องออนไลน์ในอนาคต
                 showToast("ระบบเข้าร่วมห้องออนไลน์จะเปิดใช้งานในเวอร์ชันถัดไป", "fa-clock");
             }
         };
