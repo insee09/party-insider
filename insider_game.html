@@ -210,7 +210,7 @@
                         INSIDER GAME
                     </h1>
                 </div>
-                <span class="text-[10px] tracking-widest text-indigo-300/70 font-mono block mt-0.5">V2.4 MULTI-DEVICE & PASS-PLAY</span>
+                <span class="text-[10px] tracking-widest text-indigo-300/70 font-mono block mt-0.5">V2.5 MULTI-DEVICE & PASS-PLAY</span>
             </header>
 
             <!-- Dynamic Screen Container -->
@@ -791,13 +791,20 @@
         function broadcastRoomUpdate(data) {
             roomData = data;
             
+            // Always save to localStorage and broadcast channel for local fallback & tab sync
+            try {
+                localStorage.setItem('insider_room_' + data.code, JSON.stringify(data));
+                if (roomChannel) roomChannel.postMessage(data);
+            } catch(e){}
+
+            // Sync to Firebase Realtime Database
             if (isFirebaseActive && dbRef && data.code) {
-                dbRef.ref('rooms/' + data.code).set(data);
-            } else {
-                try {
-                    localStorage.setItem('insider_room_' + data.code, JSON.stringify(data));
-                    if (roomChannel) roomChannel.postMessage(data);
-                } catch(e){}
+                dbRef.ref('games/insider/rooms/' + data.code).set(data).catch((err) => {
+                    console.warn('Firebase games/insider/rooms write failed, trying rooms/:', err);
+                    dbRef.ref('rooms/' + data.code).set(data).catch((err2) => {
+                        console.error('Firebase rooms/ write failed:', err2);
+                    });
+                });
             }
 
             updateUIForRoomState(data);
@@ -806,6 +813,15 @@
         // Subscribe to Room Updates
         function subscribeToRoom(code) {
             if (isFirebaseActive && dbRef) {
+                // Subscribe to games/insider/rooms/CODE
+                dbRef.ref('games/insider/rooms/' + code).on('value', (snapshot) => {
+                    const val = snapshot.val();
+                    if (val) {
+                        roomData = val;
+                        updateUIForRoomState(roomData);
+                    }
+                });
+                // Fallback subscription to rooms/CODE
                 dbRef.ref('rooms/' + code).on('value', (snapshot) => {
                     const val = snapshot.val();
                     if (val) {
@@ -925,7 +941,7 @@
             };
 
             if (isFirebaseActive && dbRef) {
-                dbRef.ref('stats/totalRooms').transaction((current) => (current || 0) + 1);
+                dbRef.ref('stats/insider/totalRooms').transaction((current) => (current || 0) + 1);
             }
 
             subscribeToRoom(currentRoomCode);
@@ -951,24 +967,37 @@
             isHost = false;
 
             if (isFirebaseActive && dbRef) {
-                dbRef.ref('rooms/' + code).once('value').then((snapshot) => {
-                    const room = snapshot.val();
-                    processJoin(room, playerName);
-                }).catch(() => {
-                    showToast("เกิดข้อผิดพลาดในการเชื่อมต่อห้อง", "fa-circle-xmark");
-                });
-            } else {
-                const localData = localStorage.getItem('insider_room_' + code);
-                if (localData) {
-                    try {
-                        const room = JSON.parse(localData);
+                dbRef.ref('games/insider/rooms/' + code).once('value').then((snapshot) => {
+                    let room = snapshot.val();
+                    if (room) {
                         processJoin(room, playerName);
-                    } catch(e) {
-                        showToast("ไม่พบห้องนี้ในระบบ", "fa-circle-xmark");
+                    } else {
+                        dbRef.ref('rooms/' + code).once('value').then((snap2) => {
+                            let room2 = snap2.val();
+                            if (room2) {
+                                processJoin(room2, playerName);
+                            } else {
+                                checkLocalJoin(code, playerName);
+                            }
+                        }).catch(() => checkLocalJoin(code, playerName));
                     }
-                } else {
-                    showToast("ไม่พบห้องนี้ในระบบ", "fa-circle-xmark");
+                }).catch(() => checkLocalJoin(code, playerName));
+            } else {
+                checkLocalJoin(code, playerName);
+            }
+        }
+
+        function checkLocalJoin(code, playerName) {
+            const localData = localStorage.getItem('insider_room_' + code);
+            if (localData) {
+                try {
+                    const room = JSON.parse(localData);
+                    processJoin(room, playerName);
+                } catch(e) {
+                    showToast("ไม่พบห้องนี้ในระบบ กรุณาเช็กรหัสอีกครั้ง", "fa-circle-xmark");
                 }
+            } else {
+                showToast("ไม่พบห้องนี้ในระบบ กรุณาเช็กรหัสอีกครั้ง", "fa-circle-xmark");
             }
         }
 
@@ -1194,7 +1223,7 @@
             roomData.gameplay.lastRoundSummary = "⏰ หมดเวลา! ไม่มีใครทายคำศัพท์ได้ถูกต้อง — ทั้ง Common และ Insider ทุกคนแพ้ในรอบนี้ (0 คะแนน)";
             
             if (isFirebaseActive && dbRef) {
-                dbRef.ref('stats/totalGamesPlayed').transaction((current) => (current || 0) + 1);
+                dbRef.ref('stats/insider/totalGamesPlayed').transaction((current) => (current || 0) + 1);
             }
 
             roomData.status = 'results';
@@ -1328,7 +1357,7 @@
             }
 
             if (isFirebaseActive && dbRef) {
-                dbRef.ref('stats/totalGamesPlayed').transaction((current) => (current || 0) + 1);
+                dbRef.ref('stats/insider/totalGamesPlayed').transaction((current) => (current || 0) + 1);
             }
 
             roomData.status = 'results';
