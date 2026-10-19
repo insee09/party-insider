@@ -140,6 +140,25 @@
                 <p class="text-xs md:text-sm text-slate-300 leading-relaxed">
                     เลือกบอร์ดเกมที่ชอบ สร้างห้องแล้วส่งรหัสให้เพื่อนเข้าเล่นได้เลยบนมือถือหรือคอมพิวเตอร์ สะสมสถิติการชนะและเก็บ Badge บนโปรไฟล์กลางของคุณได้ทันที!
                 </p>
+
+                <!-- สถิติสมาชิกคอมมูนิตี้ (ดึงข้อมูล Realtime จาก Firebase stats/members) -->
+                <div class="pt-2 flex flex-wrap items-center gap-3 text-xs">
+                    <div class="inline-flex items-center gap-2 bg-slate-900/80 border border-slate-700/80 px-3.5 py-1.5 rounded-xl backdrop-blur-md shadow-sm">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                        <span class="text-slate-400">สมาชิกทั้งหมด:</span>
+                        <b id="hub-total-members" class="text-amber-400 font-bold text-sm">-- คน</b>
+                    </div>
+                    <div class="inline-flex items-center gap-1.5 text-slate-400 bg-slate-900/50 border border-slate-800 px-3 py-1.5 rounded-xl">
+                        <i class="fa-brands fa-google text-red-400"></i>
+                        <span>Google:</span>
+                        <b id="hub-google-members" class="text-slate-200">--</b>
+                    </div>
+                    <div class="inline-flex items-center gap-1.5 text-slate-400 bg-slate-900/50 border border-slate-800 px-3 py-1.5 rounded-xl">
+                        <i class="fa-solid fa-envelope text-indigo-400"></i>
+                        <span>Email:</span>
+                        <b id="hub-email-members" class="text-slate-200">--</b>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -499,6 +518,9 @@
                         hubUser.email = user.email;
                         hubUser.name = user.displayName || user.email.split('@')[0];
                         hubUser.isMember = true;
+                        
+                        // ซิงค์ข้อมูลเข้า Database (users/{uid}) และนับยอดสมาชิกใหม่ (stats/members) อัตโนมัติ
+                        syncUserProfileAndStats(user);
                         fetchMemberStats(user.uid);
                     } else {
                         hubUser.isMember = false;
@@ -507,13 +529,85 @@
                     updateNavProfileUI();
                 });
 
+                listenToGlobalMemberStats();
+
             } catch (e) {
-                console.warn("Firebase Auth run in offline fallback mode.");
+                console.warn("Firebase Auth run in offline fallback mode.", e);
                 updateNavProfileUI();
             }
         }
 
-        // [9.4 ฟังก์ชันดึงสถิติสมาชิกจากฐานข้อมูล]
+        // [9.3.1 ซิงค์ข้อมูลผู้ใช้และนับสถิติสมาชิกอัตโนมัติ]
+        function syncUserProfileAndStats(user) {
+            if (!isFirebaseInitialized || !user) return;
+            const userRef = firebase.database().ref('users/' + user.uid);
+
+            userRef.once('value').then((snapshot) => {
+                const userData = snapshot.val();
+                
+                // ตรวจสอบว่าผู้ใช้ล็อกอินผ่าน Provider ใด (Google หรือ Email/Password)
+                let providerType = 'email';
+                if (user.providerData && user.providerData.length > 0) {
+                    const pid = user.providerData[0].providerId;
+                    if (pid.includes('google')) providerType = 'google';
+                }
+
+                if (!userData) {
+                    // ผู้ใช้ใหม่ (หรือผู้ใช้ที่เคยสมัครไว้แล้วแต่ยังไม่มีข้อมูลใน Database):
+                    const newProfile = {
+                        uid: user.uid,
+                        email: user.email || '',
+                        displayName: user.displayName || user.email.split('@')[0],
+                        photoURL: user.photoURL || '',
+                        provider: providerType,
+                        createdAt: firebase.database.ServerValue.TIMESTAMP,
+                        lastLoginAt: firebase.database.ServerValue.TIMESTAMP,
+                        score: 0,
+                        wins: 0
+                    };
+
+                    userRef.set(newProfile).then(() => {
+                        // อัปเดตตัวนับสมาชิกใน stats/members แบบ atomic transaction
+                        const statsRef = firebase.database().ref('stats/members');
+                        statsRef.transaction((current) => {
+                            if (!current) {
+                                return {
+                                    total: 1,
+                                    byProvider: {
+                                        google: providerType === 'google' ? 1 : 0,
+                                        email: providerType === 'email' ? 1 : 0
+                                    }
+                                };
+                            }
+                            const byProv = current.byProvider || { google: 0, email: 0 };
+                            return {
+                                ...current,
+                                total: (current.total || 0) + 1,
+                                byProvider: {
+                                    google: (byProv.google || 0) + (providerType === 'google' ? 1 : 0),
+                                    email: (byProv.email || 0) + (providerType === 'email' ? 1 : 0)
+                                }
+                            };
+                        });
+                    }).catch((err) => {
+                        console.error("Error setting new user profile:", err);
+                    });
+
+                } else {
+                    // สมาชิกที่มีข้อมูลอยู่แล้ว: อัปเดตเวลาเข้าใช้งานล่าสุด (ไม่เพิ่มตัวนับซ้ำ)
+                    userRef.update({
+                        lastLoginAt: firebase.database.ServerValue.TIMESTAMP,
+                        // อัปเดตชื่อหรือรูปภาพล่าสุดถ้ามีการเปลี่ยนแปลง
+                        ...(user.displayName ? { displayName: user.displayName } : {}),
+                        ...(user.photoURL ? { photoURL: user.photoURL } : {})
+                    });
+                }
+            }).catch((err) => {
+                console.error("Error checking user in Database:", err);
+            });
+        }
+
+        // [9.4 ฟังก์ชันดึงสถิติสมาชิกส่วนบุคคลจากฐานข้อมูล]
         function fetchMemberStats(uid) {
             if (!isFirebaseInitialized) return;
             firebase.database().ref('users/' + uid).on('value', (snapshot) => {
@@ -523,6 +617,32 @@
                     hubUser.wins = data.wins || 0;
                     if (data.name) hubUser.name = data.name;
                     updateNavProfileUI();
+                }
+            });
+        }
+
+        // [9.4.1 ฟังก์ชันดึงและอัปเดตสถิติสมาชิกภาพรวมแบบ Realtime (stats/members)]
+        function listenToGlobalMemberStats() {
+            if (!isFirebaseInitialized) return;
+            firebase.database().ref('stats/members').on('value', (snapshot) => {
+                const stats = snapshot.val();
+                const totalEl = document.getElementById('hub-total-members');
+                const googleEl = document.getElementById('hub-google-members');
+                const emailEl = document.getElementById('hub-email-members');
+
+                if (stats) {
+                    const total = stats.total || 0;
+                    const byProv = stats.byProvider || {};
+                    const google = byProv.google || 0;
+                    const email = byProv.email || 0;
+
+                    if (totalEl) totalEl.innerText = `${total} คน`;
+                    if (googleEl) googleEl.innerText = `${google} คน`;
+                    if (emailEl) emailEl.innerText = `${email} คน`;
+                } else {
+                    if (totalEl) totalEl.innerText = `0 คน`;
+                    if (googleEl) googleEl.innerText = `0`;
+                    if (emailEl) emailEl.innerText = `0`;
                 }
             });
         }
@@ -624,13 +744,25 @@
         }
 
         function loginWithGoogle() {
-            if (!isFirebaseInitialized) return;
+            if (!isFirebaseInitialized) {
+                showToastHub("ระบบ Firebase ยังไม่ได้เชื่อมต่อ กรุณารอสักครู่", "fa-triangle-exclamation");
+                return;
+            }
             const provider = new firebase.auth.GoogleAuthProvider();
             firebase.auth().signInWithPopup(provider).then((result) => {
-                showToastHub(`ยินดีต้อนรับคุณ ${result.user.displayName}!`, "fa-circle-check");
+                showToastHub(`ยินดีต้อนรับคุณ ${result.user.displayName || 'สมาชิก'}!`, "fa-circle-check");
                 closeAuthModal();
             }).catch((err) => {
-                showToastHub("เกิดข้อผิดพลาดในการเข้าสู่ระบบด้วย Google", "fa-circle-xmark");
+                console.error("Google Auth Error:", err);
+                if (err.code === 'auth/unauthorized-domain') {
+                    showToastHub("โดเมนนี้ยังไม่ได้รับอนุญาตใน Firebase Console (Authorized Domains)", "fa-circle-xmark");
+                } else if (err.code === 'auth/popup-blocked') {
+                    showToastHub("เบราว์เซอร์บล็อกหน้าต่างป๊อปอัป กรุณาอนุญาตป๊อปอัป", "fa-triangle-exclamation");
+                } else if (err.code === 'auth/popup-closed-by-user') {
+                    showToastHub("ยกเลิกการเข้าสู่ระบบด้วย Google", "fa-circle-info");
+                } else {
+                    showToastHub(`เกิดข้อผิดพลาด (${err.code || 'Auth Error'}): ${err.message}`, "fa-circle-xmark");
+                }
             });
         }
 
@@ -645,7 +777,12 @@
                 showToastHub("เข้าสู่ระบบสำเร็จ!", "fa-circle-check");
                 closeAuthModal();
             }).catch((err) => {
-                showToastHub("อีเมลหรือรหัสผ่านไม่ถูกต้อง", "fa-circle-xmark");
+                console.error("Email Login Error:", err);
+                if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password') {
+                    showToastHub("อีเมลหรือรหัสผ่านไม่ถูกต้อง", "fa-circle-xmark");
+                } else {
+                    showToastHub(`เข้าสู่ระบบไม่สำเร็จ: ${err.message}`, "fa-circle-xmark");
+                }
             });
         }
 
@@ -660,7 +797,12 @@
                 showToastHub("สมัครสมาชิกสำเร็จ!", "fa-circle-check");
                 closeAuthModal();
             }).catch((err) => {
-                showToastHub("สมัครสมาชิกไม่สำเร็จ: " + err.message, "fa-circle-xmark");
+                console.error("Email Register Error:", err);
+                if (err.code === 'auth/email-already-in-use') {
+                    showToastHub("อีเมลนี้ถูกใช้งานไปแล้ว กรุณาเข้าสู่ระบบ", "fa-triangle-exclamation");
+                } else {
+                    showToastHub("สมัครสมาชิกไม่สำเร็จ: " + err.message, "fa-circle-xmark");
+                }
             });
         }
 

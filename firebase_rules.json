@@ -31,6 +31,10 @@
     },
     "stats": {
       ".read": true,
+      "members": {
+        ".read": true,
+        ".write": "auth != null"
+      },
       "werewolf": {
         ".read": true,
         ".write": true
