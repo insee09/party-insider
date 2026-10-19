@@ -594,17 +594,25 @@
 
             // สวิตช์การเลือกโหมดจากหน้าจอ
             goToMode(mode) {
-                this.currentMode = mode;
-                if (mode === 'main-menu') {
-                    this.showScreen('screen-main-menu');
-                    document.getElementById('top-role-badge').innerText = "Werewolf Party";
-                } else if (mode === 'pass-play') {
-                    this.showScreen('screen-passplay-setup');
-                    document.getElementById('top-role-badge').innerText = "Pass & Play GM";
-                    PassPlayEngine.initSetup();
-                } else if (mode === 'online-choice') {
-                    this.showScreen('screen-online-placeholder');
-                    document.getElementById('top-role-badge').innerText = "Online Mode";
+                try {
+                    this.currentMode = mode;
+                    if (mode === 'main-menu') {
+                        this.showScreen('screen-main-menu');
+                        const badge = document.getElementById('top-role-badge');
+                        if (badge) badge.innerText = "Werewolf Party";
+                    } else if (mode === 'pass-play') {
+                        this.showScreen('screen-passplay-setup');
+                        const badge = document.getElementById('top-role-badge');
+                        if (badge) badge.innerText = "Pass & Play GM";
+                        PassPlayEngine.initSetup();
+                    } else if (mode === 'online-choice') {
+                        this.showScreen('screen-online-placeholder');
+                        const badge = document.getElementById('top-role-badge');
+                        if (badge) badge.innerText = "Online Mode";
+                    }
+                } catch (err) {
+                    console.error("WerewolfRouter goToMode Error:", err);
+                    alert("Error switching mode: " + err.message);
                 }
             }
         };
@@ -644,8 +652,8 @@
 
             // เริ่มต้นหน้า Setup
             initSetup() {
-                this.updatePlayerCount(6);
                 this.renderRoleSteppers();
+                this.updatePlayerCount(6);
             },
 
             stepPlayerCount(delta) {
