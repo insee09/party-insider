@@ -392,12 +392,27 @@
                 </button>
 
                 <!-- กล่องเลือก Mayor ชี้ประหารกรณีเสมอ -->
-                <div id="pp-mayor-tie-box" class="hidden bg-slate-950 border border-amber-500/70 rounded-2xl p-3 space-y-2 text-xs">
-                    <span class="text-amber-300 font-bold block"><i class="fa-solid fa-crown mr-1"></i> Mayor เลือกชี้ผู้ถูกประหาร (กรณีผลโหวตเสมอ):</span>
-                    <select id="pp-mayor-tie-target" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2 text-white outline-none focus:border-amber-500">
-                        <option value="">-- เลือกผู้เล่นที่ Mayor ชี้ตัดสิน --</option>
-                    </select>
-                    <button type="button" onclick="PassPlayEngine.confirmMayorTieLynch()" class="w-full py-2 bg-gradient-to-r from-amber-600 to-orange-600 text-white font-bold text-xs rounded-xl shadow active:scale-95 transition">
+                <div id="pp-mayor-tie-box" class="hidden bg-slate-950 border border-amber-500/70 rounded-2xl p-3.5 space-y-3 text-xs">
+                    <div>
+                        <span class="text-amber-300 font-bold block"><i class="fa-solid fa-crown mr-1"></i> ขั้นตอนการตัดสินของ Mayor (กรณีผลโหวตเสมอ):</span>
+                        <p class="text-[10px] text-slate-400 mt-0.5">1. ติ๊กเลือกผู้เล่นที่ได้คะแนนโหวตเท่ากันสูงสุด ➔ 2. ให้ Mayor ชี้เลือก 1 คนจากกลุ่มนี้</p>
+                    </div>
+
+                    <!-- รายการ Checkbox ติ๊กเลือกคนที่เสมอ -->
+                    <div class="space-y-1">
+                        <span class="text-[11px] font-bold text-slate-300">1. ผู้เล่นที่มีคะแนนโหวตเสมอกัน (ติ๊ก 2 คนขึ้นไป):</span>
+                        <div id="pp-mayor-tied-checkboxes" class="space-y-1 max-h-36 overflow-y-auto pr-1"></div>
+                    </div>
+
+                    <!-- Dropdown ดึงเฉพาะคนที่ถูกติ๊กด้านบน -->
+                    <div class="space-y-1 pt-1 border-t border-slate-800">
+                        <span class="text-[11px] font-bold text-amber-300">2. Mayor ชี้ตัดสินเลือกประหาร:</span>
+                        <select id="pp-mayor-tie-target" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2 text-white outline-none focus:border-amber-500">
+                            <option value="">-- รอติ๊กเลือกผู้เล่นที่เสมอด้านบนก่อน --</option>
+                        </select>
+                    </div>
+
+                    <button type="button" onclick="PassPlayEngine.confirmMayorTieLynch()" class="w-full py-2.5 bg-gradient-to-r from-amber-600 to-orange-600 text-white font-bold text-xs rounded-xl shadow active:scale-95 transition">
                         👑 ยืนยันการชี้ประหารโดย Mayor
                     </button>
                 </div>
@@ -475,6 +490,28 @@
 
     </div>
 
+    <!-- Modal ให้ GM เลือกเป้าหมายที่ Hunter ชี้ยิงตอนกลางวัน (Pass & Play) -->
+    <div id="modal-hunter-day" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="glass-panel w-full max-w-sm rounded-3xl p-5 border-2 border-rose-500 shadow-2xl space-y-4 text-center">
+            <div class="w-14 h-14 mx-auto bg-rose-600/20 border border-rose-500/50 rounded-2xl flex items-center justify-center text-3xl text-rose-400">
+                🏹
+            </div>
+            <div>
+                <h4 class="text-base font-black text-rose-400">🏹 สกิลพรานป่า (Hunter) ทำงาน!</h4>
+                <p id="modal-hunter-day-desc" class="text-xs text-slate-300 mt-1">ผู้เล่น Hunter เสียชีวิตจากการโหวตประหาร และมีสิทธิ์ยิงสังหาร 1 คนตายตามทันที</p>
+            </div>
+            <div class="space-y-1 text-left">
+                <label class="text-[11px] font-bold text-slate-300">เลือกผู้เล่นที่ Hunter ชี้ยิง:</label>
+                <select id="modal-hunter-day-select" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-xs text-white outline-none focus:border-rose-500">
+                    <option value="">-- GM เลือกคนที่ Hunter ชี้ยิง --</option>
+                </select>
+            </div>
+            <button type="button" onclick="PassPlayEngine.confirmHunterDayShot()" class="w-full py-3 bg-gradient-to-r from-rose-600 to-orange-600 hover:from-rose-500 hover:to-orange-500 text-white font-bold text-xs rounded-xl shadow-lg active:scale-95 transition">
+                🏹 ยืนยันการยิงสังหาร
+            </button>
+        </div>
+    </div>
+
     <!-- กล่องแจ้งเตือน Toast Message กลางจอด้านล่าง -->
     <div id="toast-ww" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 bg-slate-900/95 border border-indigo-500/60 text-white text-xs px-4 py-2.5 rounded-full shadow-2xl flex items-center gap-2 z-50">
         <i id="toast-ww-icon" class="fa-solid fa-circle-info text-indigo-400"></i>
@@ -498,7 +535,7 @@
             'Villager': { title: 'ชาวบ้าน (Villager)', faction: 'ฝ่ายชาวบ้าน', icon: '👨‍🌾', desc: 'ไม่มีสกิลยามค่ำคืน เน้นตรรกะและการสังเกตช่วยโหวตประหาร' },
             'Mayor': { title: 'ผู้ใหญ่บ้าน (Mayor)', faction: 'ฝ่ายชาวบ้าน', icon: '👑', desc: 'หากผลโหวตประหารเสมอกัน ผู้ใหญ่บ้านจะเป็นผู้ชี้ตัดสินประหาร' },
             'Fool': { title: 'คนบ้า (Fool)', faction: 'ฝ่ายอิสระ', icon: '🤡', desc: 'เป้าหมายชนะเดี่ยว: เนียนให้ตนเองโดนโหวตประหารชีวิตในตอนกลางวัน' },
-            'Doppelganger': { title: 'ผู้เลียนแบบ (Doppelganger)', faction: 'ฝ่ายอิสระ', icon: '🎭', desc: 'เลือกผู้เล่น 1 คนในคืนแรก หากคนนั้นตายจะสืบทอดบทบาทและฝั่งทันที' }
+            'Doppelganger': { title: 'ผู้เลียนแบบ (Doppelganger)', faction: 'ฝ่ายชาวบ้าน', icon: '🎭', desc: 'เลือกผู้เล่น 1 คนในคืนแรก หากคนนั้นตายจะสืบทอดบทบาทและฝั่งทันที' }
         };
 
         // การตั้งค่าเชื่อมต่อ Firebase Realtime Database
@@ -868,7 +905,7 @@
                                 ${p.isSilenced ? '<span class="text-[10px] bg-purple-500/20 text-purple-300 border border-purple-500/30 px-1.5 py-0.2 rounded">🔇 ถูกปิดปาก</span>' : ''}
                             </div>
                             <div class="flex items-center gap-2">
-                                <span class="text-[11px] font-bold ${isWolf ? 'text-rose-400' : 'text-indigo-300'}">${r.icon} ${r.title.split(' ')[0]}</span>
+                                <span class="text-[11px] font-bold ${isWolf ? 'text-rose-400' : 'text-indigo-300'}">${r.icon} ${r.title.split(' ')[0]}${p.isDoppelInherited ? ' (Doppel)' : ''}</span>
                                 <span class="text-[10px] font-bold px-2 py-0.5 rounded ${p.isAlive ? 'bg-emerald-950/60 text-emerald-300 border border-emerald-500/30' : 'bg-rose-950/60 text-rose-300 border border-rose-500/30'}">
                                     ${p.isAlive ? 'มีชีวิต' : 'เสียชีวิต'}
                                 </span>
@@ -949,12 +986,12 @@
                             </label>
                         ` : ''}
                         <div class="space-y-2">
-                            <select onchange="PassPlayEngine.nightSelections.wolfTarget = this.value" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2 text-white outline-none focus:border-rose-500">
+                            <select id="pp-wolf-target-1" onchange="PassPlayEngine.handleWolfTarget1Change(this.value)" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2 text-white outline-none focus:border-rose-500">
                                 <option value="">-- GM เลือกเหยื่อที่หมาป่าชี้ ${isDoubleKill ? '(คนที่ 1)' : ''} --</option>
                                 ${alivePlayers.map(p => `<option value="${p.id}">${p.num}. ${p.name} [${ALL_ROLES[p.role]?.title || p.role}]</option>`).join('')}
                             </select>
                             ${isDoubleKill ? `
-                                <select onchange="PassPlayEngine.nightSelections.wolfTarget2 = this.value" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2 text-white outline-none focus:border-rose-500">
+                                <select id="pp-wolf-target-2" onchange="PassPlayEngine.handleWolfTarget2Change(this.value)" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2 text-white outline-none focus:border-rose-500">
                                     <option value="">-- GM เลือกเหยื่อหมาป่าคนที่ 2 (จากสกิล WolfCub) --</option>
                                     ${alivePlayers.map(p => `<option value="${p.id}">${p.num}. ${p.name} [${ALL_ROLES[p.role]?.title || p.role}]</option>`).join('')}
                                 </select>
@@ -1026,6 +1063,44 @@
                 stepsContainer.innerHTML = stepsHtml;
             },
 
+            handleWolfTarget1Change(val) {
+                this.nightSelections.wolfTarget = val || null;
+                this.renderWolfTargetDropdowns();
+            },
+
+            handleWolfTarget2Change(val) {
+                this.nightSelections.wolfTarget2 = val || null;
+                this.renderWolfTargetDropdowns();
+            },
+
+            renderWolfTargetDropdowns() {
+                const isDoubleKill = this.extraKillNextNight;
+                const sel1 = document.getElementById('pp-wolf-target-1');
+                const sel2 = document.getElementById('pp-wolf-target-2');
+                if (!sel1) return;
+
+                const alivePlayers = this.players.filter(p => p.isAlive);
+                const currentVal1 = this.nightSelections.wolfTarget;
+                const currentVal2 = this.nightSelections.wolfTarget2;
+
+                // Update sel1 options: exclude currentVal2
+                let opts1 = `<option value="">-- GM เลือกเหยื่อที่หมาป่าชี้ ${isDoubleKill ? '(คนที่ 1)' : ''} --</option>`;
+                alivePlayers.forEach(p => {
+                    const isExcluded = currentVal2 && p.id === currentVal2;
+                    opts1 += `<option value="${p.id}" ${p.id === currentVal1 ? 'selected' : ''} ${isExcluded ? 'disabled' : ''}>${p.num}. ${p.name} [${ALL_ROLES[p.role]?.title || p.role}] ${isExcluded ? '(❌ ถูกเลือกในช่องที่ 2 แล้ว)' : ''}</option>`;
+                });
+                sel1.innerHTML = opts1;
+
+                if (isDoubleKill && sel2) {
+                    let opts2 = `<option value="">-- GM เลือกเหยื่อหมาป่าคนที่ 2 (จากสกิล WolfCub) --</option>`;
+                    alivePlayers.forEach(p => {
+                        const isExcluded = currentVal1 && p.id === currentVal1;
+                        opts2 += `<option value="${p.id}" ${p.id === currentVal2 ? 'selected' : ''} ${isExcluded ? 'disabled' : ''}>${p.num}. ${p.name} [${ALL_ROLES[p.role]?.title || p.role}] ${isExcluded ? '(❌ ถูกเลือกในช่องที่ 1 แล้ว)' : ''}</option>`;
+                    });
+                    sel2.innerHTML = opts2;
+                }
+            },
+
             handleDoppelgangerSelection(targetId) {
                 this.nightSelections.doppelgangerTarget = targetId;
                 const dop = this.players.find(p => p.role === 'Doppelganger');
@@ -1059,13 +1134,16 @@
                     this.extraKillNextNight = true;
                 }
 
-                // ตรวจสอบ Doppelganger ➔ สืบทอดบทบาทหากเป้าหมายตาย
+                // ตรวจสอบ Doppelganger ➔ สืบทอดบทบาทหากเป้าหมายตาย (ปัญหาที่ 2: เปลี่ยนอาชีพและใส่ (Doppel) ต่อท้าย)
                 this.players.forEach(p => {
                     if (p.isAlive && p.role === 'Doppelganger' && p.doppelTarget === player.id && !p.doppelInherited) {
-                        p.role = player.role;
+                        const inheritedRole = player.role;
+                        p.role = inheritedRole;
                         p.doppelInherited = true;
-                        if (p.role === 'Mayor') p.isMayor = true;
-                        alert(`🎭 ปาฏิหาริย์ Doppelganger!\n\nผู้เล่น ${p.name} (Doppelganger) ได้สืบทอดบทบาทใหม่เป็น: "${ALL_ROLES[p.role]?.title || p.role}" เนื่องจาก ${player.name} เสียชีวิต!`);
+                        p.isDoppelInherited = true; // Flag identifying Doppelganger copy
+                        if (inheritedRole === 'Mayor') p.isMayor = true;
+                        const roleTitle = ALL_ROLES[inheritedRole]?.title || inheritedRole;
+                        alert(`🎭 ปาฏิหาริย์ Doppelganger!\n\nผู้เล่น ${p.name} (Doppelganger) ได้สืบทอดบทบาทใหม่เป็น: "${roleTitle} (Doppel)"\nเนื่องจากเป้าหมาย (${player.name}) เสียชีวิต!`);
                     }
                 });
             },
@@ -1091,12 +1169,19 @@
                 let infectedPlayer = null;
 
                 // 1. จัดการเป้าหมายหมาป่า (Alpha Wolf / Normal Kill)
+                let infectionBlocked = false;
                 if (wolfTarget) {
                     const targetP = this.players.find(p => p.id === wolfTarget);
                     if (isAlphaInfecting && !this.alphaAbilityUsed && targetP) {
-                        this.alphaAbilityUsed = true;
-                        targetP.role = 'Werewolf';
-                        infectedPlayer = targetP;
+                        this.alphaAbilityUsed = true; // ใช้สิทธิ์ของเกมนั้นไปเลย (ปัญหาที่ 5)
+                        if (wolfTarget === guardTarget) {
+                            // บอดี้การ์ดปกป้องเหยื่อไว้ได้! แพร่เชื้อไม่สำเร็จ และเสียสิทธิ์ของตานั้นไปเลย
+                            infectionBlocked = true;
+                        } else {
+                            // แพร่เชื้อสำเร็จ: เปลี่ยนเป็น Werewolf
+                            targetP.role = 'Werewolf';
+                            infectedPlayer = targetP;
+                        }
                     } else if (wolfTarget !== guardTarget && targetP) {
                         this.registerPlayerDeath(targetP);
                         killedPlayers.push(targetP);
@@ -1133,6 +1218,10 @@
                     announcements.push(`💀 <b class="text-rose-400">มีผู้เสียชีวิตยามค่ำคืน:</b> ผู้เล่น ${names} ถูกหมาป่าสังหาร!`);
                 } else if (infectedPlayer) {
                     announcements.push(`🐺🩸 <b class="text-rose-400">ข่าวเล่าลือยามค่ำคืน:</b> คืนนี้ไม่มีผู้เสียชีวิต แต่พญาหมาป่าได้ทำการแพร่เชื้อ! มีผู้เล่น 1 คนถูกเปลี่ยนฝั่งเป็นหมาป่า!`);
+                    // ปัญหาที่ 1: การ์ดคำแนะนำลับสำหรับ GM เพื่อไปสะกิดผู้เล่นเงียบๆ
+                    announcements.push(`🤫 <b class="text-amber-300">ภารกิจลับ GM (อย่าอ่านออกเสียง):</b> เดินไปสะกิดผู้เล่น <b>${infectedPlayer.name}</b> เงียบๆ ให้ลืมตา แล้วทำสัญลักษณ์ 🐺 หรือส่งสัญญาณบอกว่า <i>"คุณได้กลายเป็นหมาป่าแล้ว"</i> จากนั้นให้หลับตาลง`);
+                } else if (infectionBlocked) {
+                    announcements.push(`✨ <b class="text-emerald-400">ข่าวดี:</b> คืนนี้ไม่มีใครเสียชีวิต! (บอดี้การ์ดปกป้องเหยื่อไว้ได้สำเร็จ การแพร่เชื้อล้มเหลว)`);
                 } else {
                     announcements.push(`✨ <b class="text-emerald-400">ข่าวดี:</b> คืนนี้ไม่มีใครเสียชีวิต! (บอดี้การ์ดอาจปกป้องเหยื่อไว้ได้)`);
                 }
@@ -1299,14 +1388,47 @@
                 const mayorTieBox = document.getElementById('pp-mayor-tie-box');
                 if (mayorTieBox) mayorTieBox.classList.add('hidden');
 
-                // อัปเดตรายชื่อใน Dropdown ของ Mayor Tie
-                const mayorSelect = document.getElementById('pp-mayor-tie-target');
-                if (mayorSelect) {
-                    mayorSelect.innerHTML = `<option value="">-- เลือกผู้เล่นที่ Mayor ชี้ตัดสิน --</option>` +
-                        alivePlayers.map(p => `<option value="${p.id}">${p.num}. ${p.name} [${ALL_ROLES[p.role]?.title || p.role}]</option>`).join('');
-                }
+                // เตรียมรายการ Checkbox สำหรับผู้เล่นที่คะแนนเสมอ (ปัญหาที่ 4)
+                this.renderMayorTiedCheckboxes();
 
                 WerewolfRouter.showScreen('screen-pp-lynch-phase');
+            },
+
+            renderMayorTiedCheckboxes() {
+                const container = document.getElementById('pp-mayor-tied-checkboxes');
+                if (!container) return;
+                const alivePlayers = this.players.filter(p => p.isAlive);
+                container.innerHTML = alivePlayers.map(p => {
+                    const doppelTag = p.isDoppelInherited ? ' (Doppel)' : '';
+                    return `
+                        <label class="flex items-center gap-2 p-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-800 cursor-pointer text-xs">
+                            <input type="checkbox" value="${p.id}" onchange="PassPlayEngine.updateMayorTieTargetDropdown()" class="accent-amber-500 w-4 h-4 pp-tied-player-chk">
+                            <span class="text-slate-200 font-bold">${p.num}. ${p.name} [${ALL_ROLES[p.role]?.title || p.role}${doppelTag}]</span>
+                        </label>
+                    `;
+                }).join('');
+                this.updateMayorTieTargetDropdown();
+            },
+
+            updateMayorTieTargetDropdown() {
+                const chks = document.querySelectorAll('.pp-tied-player-chk:checked');
+                const mayorSelect = document.getElementById('pp-mayor-tie-target');
+                if (!mayorSelect) return;
+
+                if (chks.length === 0) {
+                    mayorSelect.innerHTML = `<option value="">-- กรุณาติ๊กเลือกผู้เล่นที่มีคะแนนเสมอด้านบนก่อน --</option>`;
+                    return;
+                }
+
+                let opts = `<option value="">-- เลือกผู้เล่นที่ Mayor ชี้ตัดสิน (${chks.length} คนที่เสมอ) --</option>`;
+                chks.forEach(chk => {
+                    const p = this.players.find(x => x.id === chk.value);
+                    if (p) {
+                        const doppelTag = p.isDoppelInherited ? ' (Doppel)' : '';
+                        opts += `<option value="${p.id}">${p.num}. ${p.name} [${ALL_ROLES[p.role]?.title || p.role}${doppelTag}]</option>`;
+                    }
+                });
+                mayorSelect.innerHTML = opts;
             },
 
             toggleMayorTieSection() {
@@ -1318,7 +1440,15 @@
                     return;
                 }
                 const box = document.getElementById('pp-mayor-tie-box');
-                if (box) box.classList.toggle('hidden');
+                if (box) {
+                    const isHidden = box.classList.contains('hidden');
+                    if (isHidden) {
+                        this.renderMayorTiedCheckboxes();
+                        box.classList.remove('hidden');
+                    } else {
+                        box.classList.add('hidden');
+                    }
+                }
             },
 
             confirmMayorTieLynch() {
@@ -1375,18 +1505,12 @@
                 // 3. ประหารชีวิตผู้เล่น
                 this.registerPlayerDeath(targetPlayer);
 
-                // 4. ตรวจสอบบทบาทพรานป่า (Hunter) ➔ ยิงคนตายตาม
+                // 4. ตรวจสอบบทบาทพรานป่า (Hunter) ➔ ยิงคนตายตามผ่าน Dropdown (ปัญหาข้อ 2 & ข้อ 3)
                 if (targetPlayer.role === 'Hunter') {
                     const aliveRemaining = this.players.filter(p => p.isAlive);
                     if (aliveRemaining.length > 0) {
-                        const hunterTargetName = prompt(`🏹 สกิลพรานป่า (Hunter) ทำงาน!\n\n${targetPlayer.name} เสียชีวิต มีสิทธิ์ยิงสังหารผู้เล่นอีก 1 คนตายตามทันที\nพิมพ์ชื่อหรือหมายเลขผู้เล่นที่พรานป่าต้องการยิง:`);
-                        if (hunterTargetName) {
-                            const hunterVictim = aliveRemaining.find(p => p.name.includes(hunterTargetName) || p.num.toString() === hunterTargetName.trim());
-                            if (hunterVictim) {
-                                this.registerPlayerDeath(hunterVictim);
-                                alert(`🏹 กระสุนของพรานป่ายิงถูก ${hunterVictim.name} เสียชีวิตตามไปด้วย!`);
-                            }
-                        }
+                        this.openHunterDayModal(targetPlayer);
+                        return; // รอให้เลือกเป้าหมายผ่าน Dropdown Modal ก่อนจบเฟส
                     }
                 }
 
@@ -1398,6 +1522,52 @@
                 }
 
                 this.finishDayPhase();
+
+            openHunterDayModal(hunterPlayer) {
+                const modal = document.getElementById('modal-hunter-day');
+                const desc = document.getElementById('modal-hunter-day-desc');
+                const select = document.getElementById('modal-hunter-day-select');
+                if (!modal || !select) return;
+
+                desc.innerHTML = `ผู้เล่น <b>${hunterPlayer.name}</b> (พรานป่า) เสียชีวิตจากการโหวตประหาร!<br>ให้พรานป่าชี้เลือกสังหารผู้เล่นอีก 1 คนต่อหน้าทุกคนกลางวง:`;
+
+                const aliveRemaining = this.players.filter(p => p.isAlive);
+                select.innerHTML = `<option value="">-- GM เลือกคนที่ Hunter ชี้ยิง --</option>` +
+                    aliveRemaining.map(p => {
+                        const doppelTag = p.isDoppelInherited ? ' (Doppel)' : '';
+                        return `<option value="${p.id}">${p.num}. ${p.name} [${ALL_ROLES[p.role]?.title || p.role}${doppelTag}]</option>`;
+                    }).join('');
+
+                modal.classList.remove('hidden');
+            },
+
+            confirmHunterDayShot() {
+                const select = document.getElementById('modal-hunter-day-select');
+                const targetId = select ? select.value : '';
+                if (!targetId) {
+                    showToast("กรุณาเลือกผู้เล่นที่ Hunter ชี้ยิง", "fa-triangle-exclamation");
+                    return;
+                }
+
+                const victim = this.players.find(p => p.id === targetId);
+                const modal = document.getElementById('modal-hunter-day');
+                if (modal) modal.classList.add('hidden');
+
+                if (victim) {
+                    this.registerPlayerDeath(victim);
+                    alert(`🏹 กระสุนของพรานป่ายิงถูก ${victim.name} เสียชีวิตตามไปด้วย!`);
+                }
+
+                this.renderMasterPlayerList();
+
+                const winResult = this.checkWinCondition();
+                if (winResult) {
+                    this.showGameOverScreen(winResult);
+                    return;
+                }
+
+                this.finishDayPhase();
+            },
             },
 
             finishDayPhase() {
